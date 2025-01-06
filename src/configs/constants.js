@@ -25,11 +25,11 @@ export const NODE_ENV = Object.values(APP_ENV).includes(process.env.NODE_ENV)
     : APP_ENV.PRODUCTION
 
 // Loads `.env` file contents into process.env
-dotenv.config({
+dotenv.config({ 
     path: [
         path.join(APP_DIR, `.env.${NODE_ENV}`),
         path.join(APP_DIR, '.env')
-    ],
+    ],   
 })
 
 // environment
