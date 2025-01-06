@@ -1,0 +1,40 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "es2024": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "requireConfigFile": false
+  },
+  "parser": "@babel/eslint-parser",
+  "plugins": ["@babel", "import"],
+  "extends": ["eslint:recommended", "plugin:import/recommended"],
+  "settings": {
+    "import/resolver": {
+      "alias": {
+        "map": [["@", "./src"]],
+        "extensions": [".js"]
+      }
+    }
+  },
+  "ignorePatterns": ["node_modules", "build", "public", "private"],
+  "rules": {
+    "indent": ["error", 4, {"SwitchCase": 1}],
+    "semi": ["error", "never"],
+    "no-whitespace-before-property": "error",
+    "quotes": ["error", "single", {"avoidEscape": true}],
+    "no-cond-assign": ["error", "always"],
+    "eqeqeq": ["error", "always"],
+    "prefer-const": "error",
+    "no-var": "error",
+    "no-unused-vars": "warn",
+    "no-undef-init": "error",
+    "no-undefined": "error",
+    "require-atomic-updates": ["error", {"allowProperties": true}],
+    "require-await": "error",
+    "require-yield": "error"
+  }
+}
