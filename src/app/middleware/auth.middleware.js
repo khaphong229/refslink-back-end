@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import {tokenBlocklist} from '../services/auth.service'
+import {tokenBlocklist} from '../services/admin/auth.service'
 import {JsonWebTokenError, TokenExpiredError} from 'jsonwebtoken'
 import {abort, verifyToken} from '@/utils/helpers'
 import {TOKEN_TYPE} from '@/configs'

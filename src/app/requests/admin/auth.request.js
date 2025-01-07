@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import {User} from '../../models'
+import {Admin, User} from '../../../models'
 import {
     MAX_STRING_SIZE,
     VALIDATE_FULL_NAME_REGEX,
@@ -31,8 +31,8 @@ export const register = Joi.object({
         .custom(
             (value, helpers) =>
                 new AsyncValidate(value, async function () {
-                    const user = await User.findOne({email: value})
-                    return !user ? value : helpers.error('any.exists')
+                    const admin = await Admin.findOne({email: value})
+                    return !admin ? value : helpers.error('any.exists')
                 })
         ),
     password: Joi.string()
@@ -49,7 +49,6 @@ export const register = Joi.object({
         .trim()
         .pattern(VALIDATE_PHONE_REGEX)
         .allow('')
-        .required()
         .label('Số điện thoại')
         .custom(
             (value, helpers) =>
@@ -87,8 +86,8 @@ export const updateProfile = Joi.object({
         .custom(
             (value, helpers) =>
                 new AsyncValidate(value, async function (req) {
-                    const user = await User.findOne({email: value, _id: {$ne: req.currentUser._id}})
-                    return !user ? value : helpers.error('any.exists')
+                    const admin = await Admin.findOne({email: value, _id: {$ne: req.currentUser._id}})
+                    return !admin ? value : helpers.error('any.exists')
                 })
         ),
     phone: Joi.string()
@@ -100,8 +99,8 @@ export const updateProfile = Joi.object({
         .custom(
             (value, helpers) =>
                 new AsyncValidate(value, async function (req) {
-                    const user = await User.findOne({phone: value, _id: {$ne: req.currentUser._id}})
-                    return !user ? value : helpers.error('any.exists')
+                    const admin = await Admin.findOne({phone: value, _id: {$ne: req.currentUser._id}})
+                    return !admin ? value : helpers.error('any.exists')
                 })
         ),
     avatar: Joi.object({

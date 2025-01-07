@@ -1,4 +1,4 @@
-import * as userService from '../services/user.service'
+import * as userService from '../../services/admin/user.service'
 
 export async function readRoot(req, res) {
     const result = await userService.filter(req.query)

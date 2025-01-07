@@ -14,7 +14,8 @@ import initLocalsHandler from './handlers/init-locals.handler'
 import notFoundHandler from './handlers/not-found.handler'
 import errorHandler from './handlers/error.handler'
 
-import route from './routes'
+import routeAdmin from './routes/admin'
+import routeClient from './routes/client'
 
 function createApp() {
     // Init app
@@ -42,7 +43,10 @@ function createApp() {
     app.use(formDataHandler)
     app.use(initLocalsHandler)
 
-    route(app)
+    //route admin
+    routeAdmin(app)
+    //route client
+    routeClient(app)
 
     // Not found handler
     app.use(notFoundHandler)
