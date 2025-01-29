@@ -25,31 +25,38 @@ export const infoGeneralUser = {
         type: String,
         required: false,
     },
-    status: {
-        type: String,
-        required: true,
-        default: 'active',
-    },
     avatar: {
         type: String,
         required: false,
     },
 }
 
-const Admin = createModel('Admin', 'admins', infoGeneralUser, {
-    toJSON: {
-        virtuals: false,
-        transform(doc, ret) {
-            // eslint-disable-next-line no-unused-vars
-            const {password, ...result} = ret
-            return result
+const Admin = createModel(
+    'Admin',
+    'admins',
+    {
+        ...infoGeneralUser,
+        status: {
+            type: String,
+            required: true,
+            default: 'active',
         },
     },
-    methods: {
-        verifyPassword(password) {
-            return bcrypt.compareSync(password, this.password)
+    {
+        toJSON: {
+            virtuals: false,
+            transform(doc, ret) {
+                // eslint-disable-next-line no-unused-vars
+                const {password, ...result} = ret
+                return result
+            },
         },
-    },
-})
+        methods: {
+            verifyPassword(password) {
+                return bcrypt.compareSync(password, this.password)
+            },
+        },
+    }
+)
 
 export default Admin

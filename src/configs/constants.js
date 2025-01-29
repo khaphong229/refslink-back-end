@@ -26,10 +26,7 @@ export const NODE_ENV = Object.values(APP_ENV).includes(process.env.NODE_ENV)
 
 // Loads `.env` file contents into process.env
 dotenv.config({
-    path: [
-        path.join(APP_DIR, `.env.${NODE_ENV}`),
-        path.join(APP_DIR, '.env')
-    ],
+    path: [path.join(APP_DIR, `.env.${NODE_ENV}`), path.join(APP_DIR, '.env')],
 })
 
 // environment
@@ -44,7 +41,9 @@ export const APP_URL_CLIENT = process.env.APP_URL_CLIENT
 assert(!_.isEmpty(APP_URL_CLIENT), assertMsg('APP_URL_CLIENT'))
 
 export const OTHER_URLS_CLIENT = process.env.OTHER_URLS_CLIENT
-    ? JSON.parse(process.env.OTHER_URLS_CLIENT)
+    ? process.env.OTHER_URLS_CLIENT.startsWith('[')
+        ? JSON.parse(process.env.OTHER_URLS_CLIENT)
+        : [process.env.OTHER_URLS_CLIENT]
     : []
 assert(_.isArray(OTHER_URLS_CLIENT), 'OTHER_URLS_CLIENT must be an array.')
 
@@ -58,6 +57,7 @@ export const REQUESTS_LIMIT_PER_MINUTE = parseInt(process.env.REQUESTS_LIMIT_PER
 
 export const LINK_STATIC_URL = `${APP_URL_API}/static/`
 export const LINK_RESET_PASSWORD_URL = `${APP_URL_CLIENT}/reset-password`
+export const LINK_VERIFICATION_ACCOUNT = `${APP_URL_CLIENT}/verify-account`
 
 assert(!_.isEmpty(process.env.DB_HOST), assertMsg('DB_HOST'))
 assert(!_.isEmpty(process.env.DB_NAME), assertMsg('DB_NAME'))

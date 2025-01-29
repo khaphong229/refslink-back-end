@@ -1,7 +1,7 @@
 import moment from 'moment'
 import jwt from 'jsonwebtoken'
 import {User} from '@/models'
-import {cache, LOGIN_EXPIRE_IN, LINK_STATIC_URL, TOKEN_TYPE} from '@/configs'
+import {cache, LOGIN_EXPIRE_IN, TOKEN_TYPE} from '@/configs'
 import {FileUpload} from '@/utils/classes'
 import {generateToken} from '@/utils/helpers'
 
@@ -9,14 +9,15 @@ export const tokenBlocklist = cache.create('token-block-list')
 
 export async function checkValidLogin({email, password}) {
     const user = await User.findOne({email: email})
+    if (user.status === 'inactive') return [false, 'Chưa xác nhận tài khoản qua email!']
     if (user) {
         const verified = user.verifyPassword(password)
         if (verified) {
-            return user
+            return [true, user]
         }
     }
 
-    return false
+    return [false, 'Email hoặc mật khẩu không đúng.']
 }
 
 export function authToken(user) {
@@ -48,22 +49,46 @@ export async function blockToken(token) {
 
 export async function profile(userId) {
     const user = await User.findOne({_id: userId})
-    user.avatar = user.avatar && LINK_STATIC_URL + user.avatar
     return user
 }
 
 export async function updateProfile(
     currentUser,
-    {name, email, phone, avatar, address, birth_date, gender, category_care, social_media}
+    {
+        name,
+        email,
+        phone,
+        full_name,
+        first_name,
+        avatar,
+        address,
+        birth_date,
+        gender,
+        balance,
+        total_earned,
+        method_withdraw,
+        info_withdraw,
+        ref_code,
+        ref_by,
+        status,
+    }
 ) {
     currentUser.name = name
     currentUser.email = email
     currentUser.phone = phone
+    currentUser.full_name = full_name
+    currentUser.first_name = first_name
     currentUser.address = address
     currentUser.birth_date = birth_date
     currentUser.gender = gender
-    currentUser.category_care = category_care
-    currentUser.social_media = social_media
+    currentUser.balance = balance
+    currentUser.total_earned = total_earned
+    currentUser.method_withdraw = method_withdraw
+    currentUser.info_withdraw = info_withdraw
+    currentUser.ref_code = ref_code
+    currentUser.ref_by = ref_by
+    currentUser.status = status
+
     if (avatar instanceof FileUpload) {
         if (currentUser.avatar) {
             FileUpload.remove(currentUser.avatar)

@@ -29,3 +29,28 @@ export async function verifyForgotPasswordToken(req, res, next) {
     }
     abort(403, 'Liên kết không hợp lệ.')
 }
+
+export async function verifyEmailToken(req, res, next) {
+    const token = req.params.token
+    try {
+        const allowedToken = _.isUndefined(await tokenBlocklist.get(token))
+        if (allowedToken) {
+            const {user_id} = verifyToken(token, TOKEN_TYPE.AUTHORIZATION)
+            const user = await User.findOne({_id: user_id})
+            if (user) {
+                req.currentUser = user
+                next()
+                return
+            }
+        }
+        abort(410, 'Liên kết đã hết hạn.')
+    } catch (error) {
+        if (!(error instanceof JsonWebTokenError)) {
+            throw error
+        }
+        if (error instanceof TokenExpiredError) {
+            abort(410, 'Liên kết đã hết hạn.')
+        }
+    }
+    abort(403, 'Liên kết không hợp lệ.')
+}

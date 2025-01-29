@@ -1,4 +1,6 @@
-# Base ExpressJS
+# API BACKEND REFSLINK
+
+## Base ExpressJS
 
 Base Express JS is a foundational application for constructing RESTful APIs with Node.js.
 
@@ -15,7 +17,7 @@ Base Express JS is a foundational application for constructing RESTful APIs with
 
 ```bash
 HOST=localhost
-PORT=3456
+PORT=3111
 ```
 
 - Config Project
@@ -23,7 +25,7 @@ PORT=3456
 ```bash
 APP_NAME=Express App
 # server domain name
-APP_URL_API=http://localhost:3456
+APP_URL_API=http://localhost:3111
 # primary client domain name
 APP_URL_CLIENT=http://localhost:3000
 # other client domain name
@@ -88,16 +90,9 @@ npm run build
 7. Runs the app on `production` mode
 
 ```bash
-node build/main.js
+npm run production
 ```
 
-##### Default account
+#### Liên hệ
 
-```yaml
-Email: admin@zent.vn
-Password: Zent@123.edu.vn
-```
-
-## Credits
-
-[Vũ Xuân Hoàng](https://gitlab.com/hoangvxzentvn).
+Facebook: Kha Phong Nguyen

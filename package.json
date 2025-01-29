@@ -8,7 +8,8 @@
   },
   "main": "src/main.js",
   "scripts": {
-    "start": "nodemon",
+    "start": "cross-env BUILD_MODE=dev nodemon",
+    "production": "cross-env BUILD_MODE=production nodemon",
     "seed": "babel-node src/seeders",
     "build": "del-cli build && cross-env NODE_ENV=build babel src -d build -D",
     "lint": "eslint .",

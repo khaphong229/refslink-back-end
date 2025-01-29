@@ -78,17 +78,17 @@ export const register = Joi.object({
 export const updateProfile = Joi.object({
     name: Joi.string()
         .trim()
+        .required()
         .max(MAX_STRING_SIZE)
         .pattern(VALIDATE_FULL_NAME_REGEX)
-        .required()
         .label('Họ và tên')
         .messages({'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.'}),
     email: Joi.string()
         .trim()
         .lowercase()
         .email()
-        .max(MAX_STRING_SIZE)
         .required()
+        .max(MAX_STRING_SIZE)
         .label('Email')
         .custom(
             (value, helpers) =>
@@ -101,7 +101,6 @@ export const updateProfile = Joi.object({
         .trim()
         .pattern(VALIDATE_PHONE_REGEX)
         .allow('')
-        .required()
         .label('Số điện thoại')
         .custom(
             (value, helpers) =>
@@ -111,9 +110,7 @@ export const updateProfile = Joi.object({
                 })
         ),
     avatar: Joi.object({
-        mimetype: Joi.valid('image/jpeg', 'image/png', 'image/svg+xml', 'image/webp')
-            .required()
-            .label('Định dạng ảnh'),
+        mimetype: Joi.valid('image/jpeg', 'image/png', 'image/svg+xml', 'image/webp').label('Định dạng ảnh'),
     })
         .unknown(true)
         .instance(FileUpload)

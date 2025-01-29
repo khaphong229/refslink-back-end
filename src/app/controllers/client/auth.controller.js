@@ -1,22 +1,41 @@
-import {LINK_RESET_PASSWORD_URL, TOKEN_TYPE} from '@/configs'
+import {LINK_RESET_PASSWORD_URL, LINK_VERIFICATION_ACCOUNT, TOKEN_TYPE} from '@/configs'
 import {abort, generateToken, getToken} from '@/utils/helpers'
 import * as authService from '../../services/client/auth.service'
 import * as userService from '../../services/admin/user.service'
 
 export async function login(req, res) {
-    const validLogin = await authService.checkValidLogin(req.body)
+    const [validLogin, result] = await authService.checkValidLogin(req.body)
 
     if (validLogin) {
-        res.jsonify(authService.authToken(validLogin))
+        res.jsonify(authService.authToken(result))
     } else {
-        abort(400, 'Email hoặc mật khẩu không đúng.')
+        abort(400, result)
     }
 }
 
 export async function register(req, res) {
     const newUser = await authService.register(req.body)
     const result = authService.authToken(newUser)
-    res.status(201).jsonify(result, 'Đăng ký thành công.')
+    console.log(result, 'and', req.body)
+
+    const {access_token} = result
+    if (access_token) {
+        res.sendMail(req.body?.email, 'Xác minh tài khoản Refslink', 'emails/verification-account', {
+            name: req.body?.name,
+            linkVerificationAccount: `${LINK_VERIFICATION_ACCOUNT}/${encodeURIComponent(access_token)}`,
+        })
+    }
+    res.status(200).jsonify('Gửi yêu cầu xác minh tài khoản thành công! Vui lòng kiểm tra email.')
+    // res.status(201).jsonify(result, 'Đăng ký thành công.')
+}
+
+export async function verifyAccount(req, res) {
+    await authService.updateProfile(req.currentUser, {
+        name: req.currentUser.name,
+        email: req.currentUser.email,
+        status: 'active',
+    })
+    res.status(200).jsonify('Xác minh tài khoản thông qua email thành công!')
 }
 
 export async function logout(req, res) {

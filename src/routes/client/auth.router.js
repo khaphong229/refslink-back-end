@@ -16,6 +16,12 @@ authRouter.post(
     asyncHandler(authController.register)
 )
 
+authRouter.post(
+    '/verify-email/:token',
+    asyncHandler(authMiddleware.verifyEmailToken),
+    asyncHandler(authController.verifyAccount)
+)
+
 authRouter.post('/logout', asyncHandler(requireAuthentication), asyncHandler(authController.logout))
 
 authRouter.get('/me', asyncHandler(requireAuthentication), asyncHandler(authController.me))

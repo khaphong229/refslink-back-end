@@ -1,10 +1,20 @@
 import bcrypt from 'bcrypt'
 import createModel from '../base'
 import {infoGeneralUser} from '../admin/admin'
-import mongoose from 'mongoose'
 
 const infoFulledUser = {
     ...infoGeneralUser,
+    status: {
+        type: String,
+        required: true,
+        default: 'inactive',
+    },
+    full_name: {
+        type: String,
+    },
+    first_name: {
+        type: String,
+    },
     address: {
         type: String,
     },
@@ -14,19 +24,26 @@ const infoFulledUser = {
     gender: {
         type: String,
     },
-    category_care: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
-    },
-    social_media: {
-        type: [String],
-    },
-    successful_exchanges: {
+    balance: {
         type: Number,
         default: 0,
     },
-    last_login: {
-        type: Date,
+    total_earned: {
+        type: Number,
+        default: 0,
+    },
+    method_withdraw: {
+        type: String,
+        default: 'bank',
+    },
+    info_withdraw: {
+        type: String,
+    },
+    ref_code: {
+        type: String,
+    },
+    ref_by: {
+        type: Number,
     },
 }
 

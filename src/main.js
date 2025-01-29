@@ -9,26 +9,32 @@ import {getInterfaceIp} from './utils/helpers'
 sourceMapSupport.install()
 
 const host = process.env.HOST || 'localhost'
-const port = parseInt(process.env.PORT, 10) || 3456
+const port = parseInt(process.env.PORT, 10) || 3111
 
 const app = createApp()
 db.connect().then(() => console.log('Database connection successful!'))
 
 // Run Server
-app.listen(port, host, async function () {
-    let displayHostname = host
-    if (['0.0.0.0', '::'].includes(host)) {
-        if (host === '0.0.0.0') {
-            displayHostname = await getInterfaceIp('IPv4')
-        } else {
-            displayHostname = await getInterfaceIp('IPv6')
+if (process.env.BUILD_MODE === 'production') {
+    app.listen(process.env.PORT, () => {
+        console.log(`Production: Example app listening on ${process.env.PORT}`)
+    })
+} else {
+    app.listen(port, host, async function () {
+        let displayHostname = host
+        if (['0.0.0.0', '::'].includes(host)) {
+            if (host === '0.0.0.0') {
+                displayHostname = await getInterfaceIp('IPv4')
+            } else {
+                displayHostname = await getInterfaceIp('IPv6')
+            }
         }
-    }
-    if (host.includes(':')) {
-        displayHostname = `[${displayHostname}]`
-    }
-    console.log(`Server is running on http://${displayHostname}:${port} in ${app.settings.env} mode.`)
-})
+        if (host.includes(':')) {
+            displayHostname = `[${displayHostname}]`
+        }
+        console.log(`Server is running on http://${displayHostname}:${port} in ${app.settings.env} mode.`)
+    })
+}
 
 // scheduled tasks
 executeScheduledTasks()
