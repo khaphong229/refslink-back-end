@@ -5,6 +5,7 @@ import * as authMiddleware from '../../app/middleware/auth.middleware'
 import * as authRequest from '../../app/requests/client/auth.request'
 import * as authController from '../../app/controllers/client/auth.controller'
 import {asyncHandler} from '@/utils/helpers'
+import passport from 'passport'
 
 const authRouter = Router()
 
@@ -21,6 +22,9 @@ authRouter.post(
     asyncHandler(authMiddleware.verifyEmailToken),
     asyncHandler(authController.verifyAccount)
 )
+
+authRouter.get('/google', passport.authenticate('google', {scope: ['profile', 'email']}))
+authRouter.get('/google/callback', passport.authenticate('google'))
 
 authRouter.post('/logout', asyncHandler(requireAuthentication), asyncHandler(authController.logout))
 

@@ -85,6 +85,11 @@ assert(!_.isEmpty(MAIL_PORT), assertMsg('MAIL_PORT'))
 assert(!_.isEmpty(MAIL_USERNAME), assertMsg('MAIL_USERNAME'))
 assert(!_.isEmpty(MAIL_PASSWORD), assertMsg('MAIL_PASSWORD'))
 
+export const CLIENT_ID = process.env.CLIENT_ID
+export const CLIENT_SECRET = process.env.CLIENT_SECRET
+
+export const PRICE_PER_VIEW = 20
+
 // other
 export const TOKEN_TYPE = {
     AUTHORIZATION: 'AUTHORIZATION',

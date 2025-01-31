@@ -4,6 +4,9 @@ import {infoGeneralUser} from '../admin/admin'
 
 const infoFulledUser = {
     ...infoGeneralUser,
+    googleId: {
+        type: String,
+    },
     status: {
         type: String,
         required: true,

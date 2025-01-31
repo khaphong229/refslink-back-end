@@ -3,7 +3,7 @@ import path from 'path'
 import serveFavicon from 'serve-favicon'
 import helmet from 'helmet'
 import multer from 'multer'
-import {APP_DEBUG, NODE_ENV, PUBLIC_DIR, VIEW_DIR} from './configs'
+import {APP_DEBUG, CLIENT_ID, CLIENT_SECRET, NODE_ENV, PUBLIC_DIR, VIEW_DIR} from './configs'
 
 import {jsonify, sendMail} from './handlers/response.handler'
 import corsHandler from './handlers/cors.handler'
@@ -13,6 +13,8 @@ import formDataHandler from './handlers/form-data.handler'
 import initLocalsHandler from './handlers/init-locals.handler'
 import notFoundHandler from './handlers/not-found.handler'
 import errorHandler from './handlers/error.handler'
+import passport from 'passport'
+import {Strategy} from 'passport-google-oauth20'
 
 import routeAdmin from './routes/admin'
 import routeClient from './routes/client'
@@ -42,6 +44,19 @@ function createApp() {
     app.use(multer({storage: multer.memoryStorage()}).any())
     app.use(formDataHandler)
     app.use(initLocalsHandler)
+
+    passport.use(
+        new Strategy(
+            {
+                callbackURL: '/auth/google/callback',
+                clientID: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
+            },
+            (accessToken) => {
+                console.log(accessToken)
+            }
+        )
+    )
 
     //route admin
     routeAdmin(app)
