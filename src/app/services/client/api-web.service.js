@@ -32,3 +32,39 @@ export const create = async (body, req) => {
     await data.save()
     return data
 }
+
+export const detail = async (id) => {
+    const data = await ApiWebs.findOne({_id: id})
+    if (!data) return null
+    return data
+}
+
+export const deleted = async (id) => {
+    const res = await ApiWebs.findByIdAndDelete(id)
+    return res
+}
+
+export const update = async (data, body) => {
+    console.log(data, '&&', body)
+
+    data.name_api = body.name_api
+    // data.user_id = body.user_id
+    data.name_api = body.name_api
+    data.api_url = body.api_url
+    data.max_view = body.max_view
+    data.min_view = body.min_view
+    data.priority = body.priority
+    data.price_per_view = body.price_per_view
+    data.description = body.description
+    data.timer = body.timer
+    data.timer_duration = body.timer_duration
+    data.timer_start = body.timer_start
+    data.timer_end = body.timer_end
+    data.country_uses = body.country_uses
+    data.allowed_domains = body.allowed_domains
+    data.blocked_domains = body.blocked_domains
+    data.block_vpn = body.block_vpn
+    data.status = body.status
+    await data.save()
+    return data
+}
