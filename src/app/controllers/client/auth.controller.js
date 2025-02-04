@@ -16,7 +16,6 @@ export async function login(req, res) {
 export async function register(req, res) {
     const newUser = await authService.register(req.body)
     const result = authService.authToken(newUser)
-    console.log(result, 'and', req.body)
 
     const {access_token} = result
     if (access_token) {
