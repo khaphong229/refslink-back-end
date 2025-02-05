@@ -110,8 +110,8 @@ export const STATUS_DEFAULT_MESSAGE = {
 export const JOI_DEFAULT_OPTIONS = {
     abortEarly: false,
     errors: {
-        wrap: {label: false},
-        language: {'any.exists': 'any.exists'},
+        wrap: { label: false },
+        language: { 'any.exists': 'any.exists' },
     },
     externals: false,
     stripUnknown: true,
@@ -163,4 +163,4 @@ export const JOI_DEFAULT_OPTIONS = {
 
 export const VALIDATE_PHONE_REGEX = /^(0[235789])[0-9]{8}$/
 export const VALIDATE_PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_])/
-export const VALIDATE_FULL_NAME_REGEX = /^[a-zA-ZÀ-ỹ ]+$/
+export const VALIDATE_FULL_NAME_REGEX = /^[a-zA-ZÀ-ỹ-Z0-9]+$/

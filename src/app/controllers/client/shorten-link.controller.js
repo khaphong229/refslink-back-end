@@ -13,6 +13,8 @@ export const getAll = async (req, res) => {
 
 export const getById = async (req, res) => {
     const data = await shortenLinkService.getById(req.params.id, req)
+    console.log(data)
+
     res.status(200).jsonify(data)
 }
 

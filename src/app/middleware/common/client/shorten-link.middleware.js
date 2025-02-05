@@ -54,7 +54,7 @@ export async function shortenLink(api_url, root_link) {
     }
 }
 
-export async function checkId(req, next) {
+export async function checkId(req, res, next) {
     if (isValidObjectId(req.params.id)) {
         const data = await ShortenLink.findOne({ _id: req.params.id })
         if (data) {
