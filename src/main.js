@@ -25,13 +25,13 @@ app.listen(port, host, async function () {
         }
     }
     if (host.includes(':')) {
-        displayHostname = `[${displayHostname}]`
+        displayHostname = `[${displayHostname}]` 
     }
     console.log(`Server is running on http://${displayHostname}:${port} in ${app.settings.env} mode.`)
 })
 
 // scheduled tasks
-executeScheduledTasks()
+executeScheduledTasks()  
 
 // Eslint
 if (process.env.__ESLINT__ === 'true') {

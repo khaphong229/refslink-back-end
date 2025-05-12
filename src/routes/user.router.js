@@ -6,8 +6,8 @@ import * as userMiddleware from '../app/middleware/user.middleware'
 import * as userRequest from '../app/requests/user.request'
 import * as userController from '../app/controllers/user.controller'
 
-const userRouter = Router()
-
+const userRouter = Router() 
+ 
 userRouter.use(asyncHandler(requireAuthentication))
 
 userRouter.get(
