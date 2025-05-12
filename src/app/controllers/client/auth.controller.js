@@ -1,5 +1,5 @@
-import {LINK_RESET_PASSWORD_URL, LINK_VERIFICATION_ACCOUNT, TOKEN_TYPE} from '@/configs'
-import {abort, generateToken, getToken} from '@/utils/helpers'
+import { LINK_RESET_PASSWORD_URL, LINK_VERIFICATION_ACCOUNT, TOKEN_TYPE } from '@/configs'
+import { abort, generateToken, getToken } from '@/utils/helpers'
 import * as authService from '../../services/client/auth.service'
 import * as userService from '../../services/admin/user.service'
 
@@ -17,7 +17,7 @@ export async function register(req, res) {
     const newUser = await authService.register(req.body)
     const result = authService.authToken(newUser)
 
-    const {access_token} = result
+    const { access_token } = result
     if (access_token) {
         res.sendMail(req.body?.email, 'Xác minh tài khoản Refslink', 'emails/verification-account', {
             name: req.body?.name,
@@ -25,7 +25,6 @@ export async function register(req, res) {
         })
     }
     res.status(200).jsonify('Gửi yêu cầu xác minh tài khoản thành công! Vui lòng kiểm tra email.')
-    // res.status(201).jsonify(result, 'Đăng ký thành công.')
 }
 
 export async function verifyAccount(req, res) {
@@ -59,7 +58,7 @@ export async function changePassword(req, res) {
 }
 
 export function forgotPassword(req, res) {
-    const token = generateToken({user_id: req.currentUser._id}, TOKEN_TYPE.FORGOT_PASSWORD, 600)
+    const token = generateToken({ user_id: req.currentUser._id }, TOKEN_TYPE.FORGOT_PASSWORD, 600)
     res.sendMail(req.currentUser.email, 'Quên mật khẩu', 'emails/forgot-password', {
         name: req.currentUser.name,
         linkResetPassword: `${LINK_RESET_PASSWORD_URL}?token=${encodeURIComponent(token)}`,

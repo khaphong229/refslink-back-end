@@ -54,7 +54,7 @@ export async function getAll(queryParams) {
     return { total, current, limit, data }
 }
 
-export async function getById(id, req) {
+export async function getById(id) {
     const data = await ShortenLink.findOne({ _id: id })
     if (!data) return null
     return data

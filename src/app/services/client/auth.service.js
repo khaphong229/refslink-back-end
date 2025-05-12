@@ -1,14 +1,14 @@
 import moment from 'moment'
 import jwt from 'jsonwebtoken'
-import {User} from '@/models'
-import {cache, LOGIN_EXPIRE_IN, TOKEN_TYPE} from '@/configs'
-import {FileUpload} from '@/utils/classes'
-import {generateToken} from '@/utils/helpers'
+import { User } from '@/models'
+import { cache, TOKEN_TYPE, VERIFY_EMAIL_EXPIRE_IN } from '@/configs'
+import { FileUpload } from '@/utils/classes'
+import { generateToken } from '@/utils/helpers'
 
 export const tokenBlocklist = cache.create('token-block-list')
 
-export async function checkValidLogin({email, password}) {
-    const user = await User.findOne({email: email})
+export async function checkValidLogin({ email, password }) {
+    const user = await User.findOne({ email: email })
     if (user.status === 'inactive') return [false, 'Chưa xác nhận tài khoản qua email!']
     if (user) {
         const verified = user.verifyPassword(password)
@@ -21,7 +21,7 @@ export async function checkValidLogin({email, password}) {
 }
 
 export function authToken(user) {
-    const accessToken = generateToken({user_id: user._id}, TOKEN_TYPE.AUTHORIZATION, LOGIN_EXPIRE_IN)
+    const accessToken = generateToken({ user_id: user._id }, TOKEN_TYPE.AUTHORIZATION, VERIFY_EMAIL_EXPIRE_IN)
     const decode = jwt.decode(accessToken)
     const expireIn = decode.exp - decode.iat
     return {
@@ -31,7 +31,7 @@ export function authToken(user) {
     }
 }
 
-export async function register({avatar, ...requestBody}) {
+export async function register({ avatar, ...requestBody }) {
     if (avatar instanceof FileUpload) {
         requestBody.avatar = avatar.save('avatar')
     }
@@ -48,7 +48,7 @@ export async function blockToken(token) {
 }
 
 export async function profile(userId) {
-    const user = await User.findOne({_id: userId})
+    const user = await User.findOne({ _id: userId })
     return user
 }
 

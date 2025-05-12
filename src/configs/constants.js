@@ -24,6 +24,9 @@ export const NODE_ENV = Object.values(APP_ENV).includes(process.env.NODE_ENV)
     ? process.env.NODE_ENV
     : APP_ENV.PRODUCTION
 
+// swagger
+
+
 // Loads `.env` file contents into process.env
 dotenv.config({
     path: [path.join(APP_DIR, `.env.${NODE_ENV}`), path.join(APP_DIR, '.env')],
@@ -52,6 +55,9 @@ assert(!_.isEmpty(SECRET_KEY), assertMsg('SECRET_KEY'))
 
 export const LOGIN_EXPIRE_IN = process.env.LOGIN_EXPIRE_IN
 assert(!_.isEmpty(LOGIN_EXPIRE_IN), assertMsg('LOGIN_EXPIRE_IN'))
+
+export const VERIFY_EMAIL_EXPIRE_IN = process.env.VERIFY_EMAIL_EXPIRE_IN
+assert(!_.isEmpty(VERIFY_EMAIL_EXPIRE_IN), assertMsg('VERIFY_EMAIL_EXPIRE_IN'))
 
 export const REQUESTS_LIMIT_PER_MINUTE = parseInt(process.env.REQUESTS_LIMIT_PER_MINUTE, 10) || 1000
 
