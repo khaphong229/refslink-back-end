@@ -1,5 +1,5 @@
-const swaggerJsdoc = require("swager-jsdoc")
-const swaggerUi = require("swagger-ui-express")
+const swaggerJsdoc = require('swager-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 import { APP_URL_CLIENT } from './constants.js'
 
 const options = {

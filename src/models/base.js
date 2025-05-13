@@ -10,4 +10,4 @@ export default function createModel(name, collection, definition, options) {
     return mongoose.model(name, schema, collection)
 }
 
-export const {ObjectId} = mongoose.Types
+export const {ObjectId} = mongoose.Types 

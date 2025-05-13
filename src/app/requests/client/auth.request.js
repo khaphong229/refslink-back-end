@@ -6,7 +6,7 @@ import {
     VALIDATE_PASSWORD_REGEX,
     VALIDATE_PHONE_REGEX,
 } from '@/configs'
-import { AsyncValidate, FileUpload } from '@/utils/classes'
+import { AsyncValidate, FileUpload } from '@/utils/classes' 
 
 export const login = Joi.object({
     email: Joi.string().trim().max(MAX_STRING_SIZE).lowercase().email().required().label('Email'),
@@ -29,7 +29,7 @@ export const register = Joi.object({
         .lowercase()
         .email()
         .required()
-        .label('Email')
+        .label('Email') 
         .custom(
             (value, helpers) =>
                 new AsyncValidate(value, async function () {
