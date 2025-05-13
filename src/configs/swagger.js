@@ -1,28 +1,76 @@
-const swaggerJsdoc = require("swager-jsdoc")
-const swaggerUi = require("swagger-ui-express")
-import { APP_URL_CLIENT } from './constants.js'
+import swaggerJSDoc from 'swagger-jsdoc'
+import swaggerUi from 'swagger-ui-express'
+import path from 'path'
 
-const options = {
-    definition : {
-        openapi: '3.0.0',
-        info: {
-            title: 'Refslink api',
-            version: '1.0.0',
-            description: 'Doc swagger api of refslink'
+// Swagger definition
+const swaggerDefinition = {
+    openapi: '3.0.0',
+    info: {
+        title: 'RefsLink API Documentation',
+        version: '1.0.0',
+        description: 'API documentation for RefsLink Backend',
+        license: {
+            name: 'MIT',
+            url: 'https://opensource.org/licenses/MIT',
         },
-        servers: [
-            {
-                url: APP_URL_CLIENT,
-            }
-        ]
+        contact: {
+            name: 'API Support',
+            email: 'support@refslink.com',
+        },
     },
-    apis: ['./routes/*/js'],
+    servers: [
+        {
+            url: 'http://localhost:3111',
+            description: 'Development server',
+        },
+        {
+            url: 'https://api.refslink.com',
+            description: 'Production server',
+        },
+    ],
+    components: {
+        securitySchemes: {
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+            },
+        },
+    },
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
 }
 
-const swaggerSpec = swaggerJsdoc(options)
-
-const setupSwagger = (app) => {
-    app.use('/api-docs', swaggerUi.server, swaggerUi.setup(swaggerSpec))
+// Options for the swagger docs
+const options = {
+    swaggerDefinition,
+    // Path to the API docs
+    apis: [
+        path.join(__dirname, '../routes/**/*.js'),
+        path.join(__dirname, '../models/*.js'),
+    ],
 }
 
-module.exports = setupSwagger
+// Initialize swagger-jsdoc
+const swaggerSpec = swaggerJSDoc(options)
+
+// Initialize Swagger middleware
+export const setupSwagger = (app) => {
+    // Serve swagger docs
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+        explorer: true,
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: 'RefsLink API Documentation',
+    }))
+
+    // Serve swagger spec as JSON
+    app.get('/swagger.json', (req, res) => {
+        res.setHeader('Content-Type', 'application/json')
+        res.send(swaggerSpec)
+    })
+
+    console.log('Swagger documentation available at /api-docs')
+}

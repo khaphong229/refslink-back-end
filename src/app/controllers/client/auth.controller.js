@@ -71,3 +71,47 @@ export async function resetPassword(req, res) {
     await authService.blockToken(req.params.token)
     res.status(201).jsonify('Cập nhật mật khẩu thành công.')
 }
+
+export async function loginSuccess(req, res) {
+    const token = req.query.token
+    if (!token) {
+        return res.status(400).jsonify({ 
+            status: 400,
+            success: false,
+            message: 'Token không hợp lệ',
+            data: null
+        })
+    }
+    
+    try {
+        // Lấy thông tin user từ token
+        const decoded = req.user
+        const user = await authService.profile(decoded?._id || decoded?.user_id)
+        
+        // Trả về định dạng JSON theo yêu cầu
+        res.status(200).jsonify({
+            status: 200,
+            success: true,
+            message: 'Login successful',
+            data: {
+                access_token: token,
+                expires_in: 3600, 
+                token_type: 'Bearer',
+                user: user ? {
+                    id: user._id.toString(),
+                    name: user.name || user.full_name || '',
+                    email: user.email || '',
+                    avatar: user.avatar || ''
+                } : null
+            }
+        })
+    } catch (error) {
+        console.error('Error in login success handler:', error)
+        res.status(500).jsonify({
+            status: 500,
+            success: false,
+            message: 'Đã xảy ra lỗi khi xử lý token',
+            data: null
+        })
+    }
+}
