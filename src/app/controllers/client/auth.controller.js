@@ -2,6 +2,10 @@ import { LINK_RESET_PASSWORD_URL, LINK_VERIFICATION_ACCOUNT, TOKEN_TYPE } from '
 import { abort, generateToken, getToken } from '@/utils/helpers'
 import * as authService from '../../services/client/auth.service'
 import * as userService from '../../services/admin/user.service'
+// controllers/auth.controller.js
+
+import jwt from 'jsonwebtoken'
+import { User } from '@/models'
 
 export async function login(req, res) {
     const [validLogin, result] = await authService.checkValidLogin(req.body)
@@ -35,6 +39,26 @@ export async function verifyAccount(req, res) {
     })
     res.status(200).jsonify('Xác minh tài khoản thông qua email thành công!')
 }
+
+
+
+export async function verifyEmailToken(req, res) {
+    const { token } = req.params
+    try {
+        const payload = jwt.verify(token, process.env.JWT_SECRET)
+        const user = await User.findById(payload.user_id)
+        if (!user) return res.status(404).jsonify('Không tìm thấy người dùng')
+
+        // Cập nhật trạng thái
+        user.status = 'active'
+        await user.save()
+
+        res.status(200).jsonify('Xác minh tài khoản thành công!')
+    } catch (err) {
+        res.status(400).jsonify('Token không hợp lệ hoặc đã hết hạn.')
+    }
+}
+
 
 export async function logout(req, res) {
     const token = getToken(req.headers)
