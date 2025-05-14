@@ -67,7 +67,7 @@ const authRouter = Router()
  *         description: Unauthorized
  */
 authRouter.post('/login', asyncHandler(validate(authRequest.login)), asyncHandler(authController.login))
-
+ 
 /**
  * @swagger
  * /auth/register:
@@ -127,7 +127,7 @@ authRouter.post(
 authRouter.post(
     '/verify-account/:token',
     asyncHandler(authMiddleware.verifyEmailToken),
-    asyncHandler(authController.verifyEmailToken)
+    asyncHandler(authController.verifyAccount)
 )
 
 /**

@@ -47,10 +47,12 @@ export async function verifyEmailToken(req, res) {
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET)
         const user = await User.findById(payload.user_id)
+        console.log(user)
         if (!user) return res.status(404).jsonify('Không tìm thấy người dùng')
 
         // Cập nhật trạng thái
         user.status = 'active'
+        
         await user.save()
 
         res.status(200).jsonify('Xác minh tài khoản thành công!')
