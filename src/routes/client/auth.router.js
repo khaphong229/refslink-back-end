@@ -129,7 +129,7 @@ authRouter.post(
     asyncHandler(authMiddleware.verifyEmailToken),
     asyncHandler(authController.verifyAccount)
 )
-
+  
 /**
  * @swagger
  * /auth/google:

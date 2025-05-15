@@ -9,8 +9,7 @@ import {getInterfaceIp} from './utils/helpers'
 sourceMapSupport.install()
 
 const host = process.env.HOST || 'localhost'
-const port = parseInt(process.env.PORT, 10) || 3111
-
+const port = parseInt(process.env.PORT, 10) || 3111 
 const app = createApp()
 db.connect().then(() => console.log('Database connection successful!'))
 

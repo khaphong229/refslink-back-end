@@ -15,7 +15,7 @@ export async function checkValidLogin({ email, password }) {
         if (verified) {
             return [true, user]
         }
-    }
+    } 
 
     return [false, 'Email hoặc mật khẩu không đúng.']
 }
