@@ -1,10 +1,12 @@
 import ApiWebs from '@/models/client/api-webs'
 import aqp from 'api-query-params'
 
-export const filter = async (queryParams, limit = 10, current = 1) => {
-    const { filter: queryFilter, sort: querySort = { created_at: -1 } } = aqp(queryParams)
-    const searchConditions = {} // Để trống mặc định sẽ trả về tất cả
+export const filter = async (queryParams, limit = 10, current = 1, req) => {
 
+    const user_id = req.currentUser._id    
+    const { filter: queryFilter, sort: querySort = { created_at: -1 } } = aqp(queryParams)
+    const searchConditions = { user_id } // Add user_id filter by default
+    
     // Chỉ tạo điều kiện tìm kiếm khi có query
     if (queryFilter && Object.keys(queryFilter).length > 0) {
         // Xử lý tìm kiếm với q
