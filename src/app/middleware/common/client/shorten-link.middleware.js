@@ -2,6 +2,7 @@ import ApiWebs from '@/models/client/api-webs'
 import ShortenLink from '@/models/client/shorten-link'
 import { abort } from '@/utils/helpers'
 import { isValidObjectId } from 'mongoose'
+const fetch = require('node-fetch')
 
 export async function checkShortenLink(req, res, next) {
     const { original_link: url } = req.body
