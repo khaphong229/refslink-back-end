@@ -14,9 +14,11 @@ export async function create(body, req) {
     return data
 }
 
-export async function getAll(queryParams) {
+export async function getAll(queryParams, req) {
+    const user_id = req.currentUser._id
+    
     const { filter: queryFilter, sort: querySort = { created_at: -1 } } = aqp(queryParams)
-    const searchConditions = {}
+    const searchConditions = {user_id}
     const limit = queryFilter?.limit || 10
     const current = queryFilter?.current || 1
 

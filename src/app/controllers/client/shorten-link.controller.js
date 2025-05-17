@@ -7,7 +7,7 @@ export const create = async (req, res) => {
 }
 
 export const getAll = async (req, res) => {
-    const data = await shortenLinkService.getAll(req.query)
+    const data = await shortenLinkService.getAll(req.query, req)
     res.status(200).jsonify(data)
 }
 
