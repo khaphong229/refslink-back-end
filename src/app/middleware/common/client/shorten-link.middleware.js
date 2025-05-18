@@ -37,8 +37,7 @@ export async function getApiWebActive(req, res, next) {
 
 export async function shortenLink(api_url, root_link) {
     const url = `${api_url}${root_link}`
-    console.log(url)
-
+    
     try {
         const response = await fetch(url)
         const result = await response.json()

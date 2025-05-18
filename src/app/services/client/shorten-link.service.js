@@ -1,14 +1,24 @@
 import { shortenLink } from '@/app/middleware/common/client/shorten-link.middleware'
 import ShortenLink from '@/models/client/shorten-link'
 import aqp from 'api-query-params'
+import { generateAlias } from '@/utils/generateAlias'
 
 export async function create(body, req) {
     const user_id = req.currentUser._id
-    const short_link = await shortenLink(req.apiWebActive.api_url, req.body.original_link)
+    const alias = generateAlias()
+    const apiWeb = req.apiWebActive
+    
+    const third_party_link = await shortenLink(apiWeb.api_url, body.original_link)
+    
+    const host = req.get('host')
+    const protocol = req.protocol
+    const shorten_link = `${protocol}://${host}/${alias}`
 
-    body.api_web_id = req.apiWebActive._id
+    body.api_web_id = apiWeb._id
     body.user_id = user_id
-    body.shorten_link = short_link
+    body.shorten_link = shorten_link
+    body.third_party_link = third_party_link
+    body.alias = alias
     const data = new ShortenLink(body)
     await data.save()
     return data
@@ -66,4 +76,8 @@ export async function hiddenLink(body, data) {
     data.status = 'inactive'
     await data.save()
     return data
+}
+
+export async function getByAtlas(alias) {
+    return await ShortenLink.findOne({ alias: alias })
 }

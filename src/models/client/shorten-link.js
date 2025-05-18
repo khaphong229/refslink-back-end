@@ -25,6 +25,10 @@ const ShortenLinkSchema = {
         type: String,
         require: true,
     },
+    third_party_link: {
+        type: String,
+        require: true,
+    },
     click_count: {
         type: Number,
         default: 0,
