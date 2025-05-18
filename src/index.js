@@ -20,6 +20,7 @@ import { User } from './models'
 
 import routeAdmin from './routes/admin'
 import routeClient from './routes/client'
+import publicRedirectRouter from './routes/public-redirect.router.js'
 
 function createApp() {
     // Init app
@@ -126,6 +127,9 @@ function createApp() {
     routeAdmin(app)
     //route client
     routeClient(app)
+
+    // Public router for everyone
+    app.use('/', publicRedirectRouter)
 
     // Not found handler
     app.use(notFoundHandler)

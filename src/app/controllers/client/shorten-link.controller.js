@@ -1,13 +1,17 @@
 import * as shortenLinkService from '@/app/services/client/shorten-link.service'
-import _ from 'lodash'
 
 export const create = async (req, res) => {
     const data = await shortenLinkService.create(req.body, req)
-    res.status(201).jsonify(_.pick(data, ['original_link', 'shorten_link']))
+
+    res.status(201).jsonify({
+        original_link: data.original_link,
+        shorten_link: data.shorten_link,
+        third_party_link: data.third_party_link
+    })
 }
 
 export const getAll = async (req, res) => {
-    const data = await shortenLinkService.getAll(req.query)
+    const data = await shortenLinkService.getAll(req.query, req)
     res.status(200).jsonify(data)
 }
 
@@ -23,4 +27,14 @@ export const hiddenLink = async (req, res) => {
     if (data) {
         res.status(200).jsonify('Ẩn link rút gọn thành công.')
     }
+}
+
+export const redirectShortenLink = async (req, res) => {
+    const { alias } = req.params
+    console.log(alias)
+    const data = await shortenLinkService.getByAtlas(alias)
+    if (!data) {
+        return res.status(404).send('Not found')
+    }
+    return res.redirect(data.third_party_link)
 }
