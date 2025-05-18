@@ -61,7 +61,7 @@ export async function checkId(req, res, next) {
         if (data) {
             req.data = data
             next()
-            return
+            return   
         }
     }
     abort(404, 'Link rút gọn không tồn tại')

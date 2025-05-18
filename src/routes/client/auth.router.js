@@ -103,8 +103,8 @@ authRouter.post(
     '/register',
     asyncHandler(validate(authRequest.register)),
     asyncHandler(authController.register)
-)
-
+) 
+  
 /**
  * @swagger
  * /auth/verify-email/{token}:

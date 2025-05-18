@@ -4,7 +4,7 @@ import {
     MAX_STRING_SIZE,
     VALIDATE_FULL_NAME_REGEX,
     VALIDATE_PASSWORD_REGEX,
-    VALIDATE_PHONE_REGEX,
+    VALIDATE_PHONE_REGEX, 
 } from '@/configs'
 import { AsyncValidate, FileUpload } from '@/utils/classes'
 

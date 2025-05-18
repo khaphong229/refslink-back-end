@@ -6,8 +6,8 @@ import executeScheduledTasks from './tasks'
 import {getInterfaceIp} from './utils/helpers'
 
 // enable source maps
-sourceMapSupport.install()
-
+sourceMapSupport.install()   
+ 
 const host = process.env.HOST || 'localhost'
 const port = parseInt(process.env.PORT, 10) || 3111 
 const app = createApp()
@@ -19,7 +19,7 @@ if (process.env.BUILD_MODE === 'production') {
         console.log(`Production: Example app listening on ${process.env.PORT}`)
     })
 } else {
-    app.listen(port, host, async function () {
+    app.listen(port, host, async function () { 
         let displayHostname = host
         if (['0.0.0.0', '::'].includes(host)) {
             if (host === '0.0.0.0') {
@@ -33,7 +33,7 @@ if (process.env.BUILD_MODE === 'production') {
         }
         console.log(`Server is running on http://${displayHostname}:${port} in ${app.settings.env} mode.`)
     })
-}
+} 
 
 // scheduled tasks
 executeScheduledTasks()

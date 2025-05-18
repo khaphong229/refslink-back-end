@@ -6,7 +6,7 @@
   "engines": {
     "node": ">=20"
   },
-  "main": "src/main.js",
+  "main": "src/main.js", 
   "scripts": {
     "start": "cross-env BUILD_MODE=dev nodemon",
     "production": "cross-env BUILD_MODE=production nodemon",
