@@ -2,8 +2,8 @@ import * as apiWebService from '@/app/services/client/api-web.service'
 
 export const readRoot = async (req, res) => {
     const limit = Math.max(1, parseInt(req.query.limit) || 10)
-    const current = Math.max(1, parseInt(req.query.current) || 10)
-    const result = await apiWebService.filter(req.query, limit, current, req)
+    const page = Math.max(1, parseInt(req.query.page) || 1)
+    const result = await apiWebService.filter(req.query, limit, page, req)
     res.jsonify(result)
 }
 
