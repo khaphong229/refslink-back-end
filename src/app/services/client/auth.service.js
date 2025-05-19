@@ -1,7 +1,7 @@
 import moment from 'moment'
 import jwt from 'jsonwebtoken'
 import { User } from '@/models'
-import { cache, TOKEN_TYPE, VERIFY_EMAIL_EXPIRE_IN } from '@/configs'
+import { cache, LOGIN_EXPIRE_IN, TOKEN_TYPE } from '@/configs'
 import { FileUpload } from '@/utils/classes'
 import { generateToken } from '@/utils/helpers'
 
@@ -15,13 +15,13 @@ export async function checkValidLogin({ email, password }) {
         if (verified) {
             return [true, user]
         }
-    } 
+    }
 
     return [false, 'Email hoặc mật khẩu không đúng.']
 }
 
 export function authToken(user) {
-    const accessToken = generateToken({ user_id: user._id }, TOKEN_TYPE.AUTHORIZATION, VERIFY_EMAIL_EXPIRE_IN)
+    const accessToken = generateToken({ user_id: user._id }, TOKEN_TYPE.AUTHORIZATION, LOGIN_EXPIRE_IN)
     const decode = jwt.decode(accessToken)
     const expireIn = decode.exp - decode.iat
     return {
