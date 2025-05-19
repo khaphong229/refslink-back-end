@@ -2,8 +2,9 @@ import * as shortenLinkService from '@/app/services/client/shorten-link.service'
 
 export const create = async (req, res) => {
     const data = await shortenLinkService.create(req.body, req)
-
+    console.log(data)
     res.status(201).jsonify({
+        id : data._id,
         original_link: data.original_link,
         shorten_link: data.shorten_link,
         third_party_link: data.third_party_link
