@@ -7,7 +7,7 @@ import {abort, getToken, verifyToken} from '@/utils/helpers'
 
 async function requireAuthentication(req, res, next) {
     try {
-        const token = getToken(req.headers)
+        const token = getToken(req.headers) 
 
         if (token) {
             const allowedToken = _.isUndefined(await tokenBlocklist.get(token))
