@@ -1,12 +1,11 @@
 import ApiWebs from '@/models/client/api-webs'
 import aqp from 'api-query-params'
 
-export const filter = async (queryParams, limit = 10, current = 1, req) => {
-
-    const user_id = req.currentUser._id    
+export const filter = async (queryParams, limit = 10, page = 1, req) => {
+    const user_id = req.currentUser._id
     const { filter: queryFilter, sort: querySort = { created_at: -1 } } = aqp(queryParams)
     const searchConditions = { user_id } // Add user_id filter by default
-    
+
     // Chỉ tạo điều kiện tìm kiếm khi có query
     if (queryFilter && Object.keys(queryFilter).length > 0) {
         // Xử lý tìm kiếm với q
@@ -14,7 +13,7 @@ export const filter = async (queryParams, limit = 10, current = 1, req) => {
             const searchValue = queryFilter.q
             delete queryFilter.q
             delete queryFilter.limit
-            delete queryFilter.current
+            delete queryFilter.page
 
             searchConditions.$or = [
                 { name_api: { $regex: searchValue, $options: 'i' } },
@@ -25,7 +24,7 @@ export const filter = async (queryParams, limit = 10, current = 1, req) => {
 
         // Xử lý các điều kiện tìm kiếm khác
         Object.entries(queryFilter).forEach(([key, value]) => {
-            if (!['limit', 'current'].includes(key)) {
+            if (!['limit', 'page'].includes(key)) {
                 searchConditions[key] = typeof value === 'string' ? { $regex: value, $options: 'i' } : value
             }
         })
@@ -33,14 +32,14 @@ export const filter = async (queryParams, limit = 10, current = 1, req) => {
 
     const [data, total] = await Promise.all([
         ApiWebs.find(searchConditions)
-            .skip((current - 1) * limit)
+            .skip((page - 1) * limit)
             .limit(limit)
             .sort(querySort)
             .lean(),
         ApiWebs.countDocuments(searchConditions),
     ])
 
-    return { total, current, limit, data }
+    return { total, page, limit, data }
 }
 
 export const create = async (body, req) => {
