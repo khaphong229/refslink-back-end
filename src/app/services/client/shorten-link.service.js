@@ -10,10 +10,8 @@ export async function create(body, req) {
     const apiWeb = req.apiWebActive
     
     const third_party_link = await shortenLink(apiWeb.api_url, body.original_link)
-    
-    const host = req.get('host')
-    const protocol = req.protocol
-    const shorten_link = `${protocol}://${host}/${alias}`
+
+    const shorten_link = `${process.env.APP_URL_CLIENT}/${alias}`
 
     body.api_web_id = apiWeb._id
     body.user_id = user_id
