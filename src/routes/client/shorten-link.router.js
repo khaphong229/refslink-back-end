@@ -34,4 +34,11 @@ shortenLinkRouter.patch(
     asyncHandler(shortenLinkController.hiddenLink)
 )
 
+shortenLinkRouter.delete(
+    '/:id',
+    asyncHandler(requireAuthentication),
+    asyncHandler(shortenLinkMiddleWare.checkShortenLinkDelete),
+    asyncHandler(shortenLinkController.deleteByID)
+)
+
 export default shortenLinkRouter

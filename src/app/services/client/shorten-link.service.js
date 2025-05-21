@@ -2,6 +2,7 @@ import { shortenLink } from '@/app/middleware/common/client/shorten-link.middlew
 import ShortenLink from '@/models/client/shorten-link'
 import aqp from 'api-query-params'
 import { generateAlias } from '@/utils/generateAlias'
+import { abort } from '@/utils/helpers'
 
 export async function create(body, req) {
     const user_id = req.currentUser._id
@@ -9,10 +10,8 @@ export async function create(body, req) {
     const apiWeb = req.apiWebActive
     
     const third_party_link = await shortenLink(apiWeb.api_url, body.original_link)
-    
-    const host = req.get('host')
-    const protocol = req.protocol
-    const shorten_link = `${protocol}://${host}/${alias}`
+
+    const shorten_link = `${process.env.APP_URL_CLIENT}/${alias}`
 
     body.api_web_id = apiWeb._id
     body.user_id = user_id
@@ -80,4 +79,9 @@ export async function hiddenLink(body, data) {
 
 export async function getByAtlas(alias) {
     return await ShortenLink.findOne({ alias: alias })
+}
+
+export async function deleteByID(id, req) {
+    const data = await ShortenLink.findOneAndDelete({ _id : id, user_id: req.currentUser._id })
+    return data
 }

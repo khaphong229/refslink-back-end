@@ -33,3 +33,10 @@ export const redirectShortenLink = async (req, res) => {
     }
     return res.redirect(data.third_party_link)
 }
+
+export async function deleteByID(req, res) {
+    const id = req.params.id
+    const data = await shortenLinkService.deleteByID(id, req)
+    if (!data) throw new Error('Không tìm thấy link để xóa')
+    return res.status(200).jsonify('Xoá link rút gọn thành công.')
+}

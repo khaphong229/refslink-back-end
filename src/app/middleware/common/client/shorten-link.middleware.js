@@ -37,7 +37,7 @@ export async function getApiWebActive(req, res, next) {
 
 export async function shortenLink(api_url, root_link) {
     const url = `${api_url}${root_link}`
-    
+
     try {
         const response = await fetch(url)
         const result = await response.json()
@@ -64,4 +64,25 @@ export async function checkId(req, res, next) {
         }
     }
     abort(404, 'Link rút gọn không tồn tại')
+}
+
+export async function checkShortenLinkDelete(req, res, next) {
+    let data = null
+
+    if (req.params.id) {
+        try {
+            data = await ShortenLink.find({ _id: req.params.id})
+            console.log(data)
+        } catch (error) {
+            console.error('Error while finding shorten link:', error)
+            return res.status(500).json({ message: 'Internal server error' })
+        }
+    }
+
+    if (data) {
+        req.data = data
+        return next()
+    } else {
+        return res.status(404).json({ message: 'Link rút gọn không tồn tại' })
+    }
 }
