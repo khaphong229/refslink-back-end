@@ -45,6 +45,23 @@ export const filter = async (queryParams, limit = 10, page = 1, req) => {
 export const create = async (body, req) => {
     const user_id = req.currentUser._id
     body.user_id = user_id
+    const match = body.api_url.match(/^https?:\/\/([^./]+)\./)
+    body.name_api = match ? match[1] : null
+
+    // Convert time strings to Date objects if they exist
+    if (body.timer_start) {
+        const [hours, minutes, seconds] = body.timer_start.split(':')
+        const date = new Date()
+        date.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds))
+        body.timer_start = date
+    }
+    if (body.timer_end) {
+        const [hours, minutes, seconds] = body.timer_end.split(':')
+        const date = new Date()
+        date.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds))
+        body.timer_end = date
+    }
+
     const data = new ApiWebs(body)
     await data.save()
     return data
@@ -62,9 +79,6 @@ export const deleted = async (id) => {
 }
 
 export const update = async (data, body) => {
-    data.name_api = body.name_api
-    // data.user_id = body.user_id
-    data.name_api = body.name_api
     data.api_url = body.api_url
     data.max_view = body.max_view
     data.min_view = body.min_view
@@ -73,12 +87,31 @@ export const update = async (data, body) => {
     data.description = body.description
     data.timer = body.timer
     data.timer_duration = body.timer_duration
-    data.timer_start = body.timer_start
-    data.timer_end = body.timer_end
+
+    // Convert time strings to Date objects if they exist
+    if (body.timer_start) {
+        const [hours, minutes, seconds] = body.timer_start.split(':')
+        const date = new Date()
+        date.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds))
+        data.timer_start = date
+    }
+    if (body.timer_end) {
+        const [hours, minutes, seconds] = body.timer_end.split(':')
+        const date = new Date()
+        date.setHours(parseInt(hours), parseInt(minutes), parseInt(seconds))
+        data.timer_end = date
+    }
+
     data.country_uses = body.country_uses
     data.allowed_domains = body.allowed_domains
     data.blocked_domains = body.blocked_domains
     data.block_vpn = body.block_vpn
+    data.status = body.status
+    await data.save()
+    return data
+}
+
+export const changeStatus = async (data, body) => {
     data.status = body.status
     await data.save()
     return data
