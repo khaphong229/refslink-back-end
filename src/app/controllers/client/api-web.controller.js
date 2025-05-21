@@ -26,3 +26,10 @@ export const update = async (req, res) => {
     const result = await apiWebService.update(req.data, req.body)
     res.status(200).jsonify(result)
 }
+
+export const changeStatus = async (req, res) => {
+    const result = await apiWebService.changeStatus(req.data, req.body)
+    if (result?.data?.status !== req.body.status) {
+        res.status(200).jsonify('Cập nhật API thành công.')
+    }
+}

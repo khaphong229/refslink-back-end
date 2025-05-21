@@ -26,11 +26,13 @@ export const NODE_ENV = Object.values(APP_ENV).includes(process.env.NODE_ENV)
 
 // swagger
 
-
 // Loads `.env` file contents into process.env
 dotenv.config({
     path: [path.join(APP_DIR, `.env.${NODE_ENV}`), path.join(APP_DIR, '.env')],
 })
+
+//others
+export const PRICE_PER_VIEW_MONEY = process.env.PRICE_PER_VIEW
 
 // environment
 export const APP_DEBUG = NODE_ENV === APP_ENV.DEVELOPMENT
