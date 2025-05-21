@@ -2,12 +2,8 @@ import * as shortenLinkService from '@/app/services/client/shorten-link.service'
 
 export const create = async (req, res) => {
     const data = await shortenLinkService.create(req.body, req)
-
-    res.status(201).jsonify({
-        original_link: data.original_link,
-        shorten_link: data.shorten_link,
-        third_party_link: data.third_party_link
-    })
+    console.log(data)
+    res.status(201).jsonify(data)
 }
 
 export const getAll = async (req, res) => {
@@ -18,7 +14,6 @@ export const getAll = async (req, res) => {
 export const getById = async (req, res) => {
     const data = await shortenLinkService.getById(req.params.id, req)
     console.log(data)
-
     res.status(200).jsonify(data)
 }
 
@@ -37,4 +32,11 @@ export const redirectShortenLink = async (req, res) => {
         return res.status(404).send('Not found')
     }
     return res.redirect(data.third_party_link)
+}
+
+export async function deleteByID(req, res) {
+    const id = req.params.id
+    const data = await shortenLinkService.deleteByID(id, req)
+    if (!data) throw new Error('Không tìm thấy link để xóa')
+    return res.status(200).jsonify('Xoá link rút gọn thành công.')
 }

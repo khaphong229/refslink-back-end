@@ -17,9 +17,11 @@ const ApiWebsSchema = {
     },
     max_view: {
         type: Number,
+        default: 20,
     },
     min_view: {
         type: Number,
+        default: 1,
     },
     priority: {
         type: Number,
