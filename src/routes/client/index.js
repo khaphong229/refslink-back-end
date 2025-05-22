@@ -8,7 +8,7 @@ function routeClient(app) {
     app.use('/auth', authRouter)
     app.use('/api-webs', apiWebRouter)
     app.use('/shorten-link', shortenLinkRouter)
-    app.use('/supports',supportRouter) 
+    app.use('/support',supportRouter) 
     app.use('/', shortenToolRouter)
 }
 

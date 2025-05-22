@@ -125,7 +125,7 @@ authRouter.post(
  *         description: Invalid or expired token
  */
 authRouter.post(
-    '/verify-account/:token',
+    '/verify-email/:token',
     asyncHandler(authMiddleware.verifyEmailToken),
     asyncHandler(authController.verifyAccount)
 )

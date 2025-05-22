@@ -10,10 +10,16 @@ import * as supportRequest from '@/app/requests/client/support.request'
 const supportRouter = express.Router()
 
 supportRouter.post(
-    '/create',
+    '/',
     asyncHandler(requireAuthentication),
     asyncHandler(validate(supportRequest.create)),
     asyncHandler(SupportController.create)
+)
+
+supportRouter.get(
+    '/',
+    asyncHandler(requireAuthentication),
+    asyncHandler(SupportController.getAll)
 )
 
 export default supportRouter
