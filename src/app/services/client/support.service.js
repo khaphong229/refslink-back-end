@@ -9,46 +9,43 @@ export const create = async (body, req) =>{
 }
 
 
-export async function getAll(queryParams, req) {
-    const user_id = req.currentUser._id
+export const getAll = async (query, req) => {
+    try {
+        const { filter, skip, limit, sort, projection, population } = aqp(query)
+        
+        // Xử lý phân trang
+        const page = parseInt(query.page) || 1
+        const pageSize = parseInt(query.limit) || 10
+        const skipCount = (page - 1) * pageSize
 
-    const { filter: queryFilter, sort: querySort = { created_at: -1 } } = aqp(queryParams)
-    const searchConditions = { user_id }
-    const limit = Number(queryFilter?.limit) || 10
-    const current = Number(queryFilter?.current) || 1
+        // Query với filter
+        const supports = await Support.find(filter)
+            .select(projection)
+            .sort(sort)
+            .skip(skipCount)
+            .limit(pageSize)
+            .populate(population)
+            .lean()
 
-    if (queryFilter && Object.keys(queryFilter).length > 0) {
-        if (queryFilter.q) {
-            const searchValue = queryFilter.q
-            delete queryFilter.q
-            delete queryFilter.limit
-            delete queryFilter.current
+        // Đếm tổng số records
+        const total = await Support.countDocuments(filter)
 
-            searchConditions.$or = [
-                { full_name: { $regex: searchValue, $options: 'i' } },
-                { email: { $regex: searchValue, $options: 'i' } },
-                { subject: { $regex: searchValue, $options: 'i' } },
-                { description: { $regex: searchValue, $options: 'i' } },
-            ]
+        return {
+            success: true,
+            data: supports,
+            pagination: {
+                currentPage: page,
+                pageSize: pageSize,
+                totalRecords: total,
+                totalPages: Math.ceil(total / pageSize)
+            },
+            message: 'Supports retrieved successfully'
         }
-
-        Object.entries(queryFilter).forEach(([key, value]) => {
-            if (!['limit', 'current'].includes(key)) {
-                searchConditions[key] = typeof value === 'string'
-                    ? { $regex: value, $options: 'i' }
-                    : value
-            }
-        })
+    } catch (error) {
+        throw {
+            success: false,
+            message: error.message || 'Error retrieving supports',
+            error: error
+        }
     }
-
-    const [data, total] = await Promise.all([
-        Support.find(searchConditions)
-            .skip((current - 1) * limit)
-            .limit(limit)
-            .sort(querySort)
-            .lean(),
-        Support.countDocuments(searchConditions),
-    ])
-
-    return { total, current, limit, data }
 }
