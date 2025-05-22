@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import createModel from '../base'
 import {infoGeneralUser} from '../admin/admin'
+import { type } from 'os'
 
 const infoFulledUser = {
     ...infoGeneralUser,
@@ -11,6 +12,10 @@ const infoFulledUser = {
         type: String,
         required: true,
         default: 'inactive',
+    },
+    avatar:{
+        type: String,
+        default: 'https://res.cloudinary.com/dqj0xgk8v/image/upload/v1695860982/avater/avater-default.png',
     },
     full_name: {
         type: String,
@@ -30,6 +35,9 @@ const infoFulledUser = {
     balance: {
         type: Number,
         default: 0,
+    },
+    phone:{
+        type: String, 
     },
     total_earned: {
         type: Number,

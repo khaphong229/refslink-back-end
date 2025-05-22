@@ -89,6 +89,16 @@ export const updateItem = Joi.object({
                     return !user ? value : helpers.error('any.exists')
                 })
         ),
+    status: Joi.string()
+        .valid('active', 'inactive')
+        .required()
+        .label('Trạng thái')
+        .custom((value, helpers) => {
+            if (value === 'inactive') {
+                return value
+            }
+            return value === 'active' ? value : helpers.error('any.invalid')
+        }),
     avatar: Joi.object({
         mimetype: Joi.valid('image/jpeg', 'image/png', 'image/svg+xml', 'image/webp')
             .required()
