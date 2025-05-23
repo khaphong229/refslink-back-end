@@ -1,4 +1,4 @@
-import createModel, {ObjectId} from '../base'
+import createModel, { ObjectId } from '../base'
 
 const ShortenLinkSchema = {
     api_web_id: {
@@ -41,8 +41,14 @@ const ShortenLinkSchema = {
         type: Number,
         default: 0,
     },
-    // countries: {},
-    // devices: {},
+    countries: {
+        type: Array,
+        default: [],
+    },
+    devices: {
+        type: Array,
+        default: [],
+    },
     status: {
         type: String,
         default: 'active',

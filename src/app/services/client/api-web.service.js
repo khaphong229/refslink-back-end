@@ -48,7 +48,6 @@ export const create = async (body, req) => {
     const match = body.api_url.match(/^https?:\/\/([^./]+)\./)
     body.name_api = match ? match[1] : null
 
-    // Convert time strings to Date objects if they exist
     if (body.timer_start) {
         const [hours, minutes, seconds] = body.timer_start.split(':')
         const date = new Date()

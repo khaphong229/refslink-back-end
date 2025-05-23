@@ -13,7 +13,6 @@ shortenLinkRouter.post(
     asyncHandler(requireAuthentication),
     asyncHandler(shortenLinkMiddleWare.checkShortenLink),
     asyncHandler(shortenLinkMiddleWare.getApiWebActive),
-    // asyncHandler(shortenLinkMiddleWare.shortenLink),
     asyncHandler(validate(shortenLinkRequest.create)),
     asyncHandler(shortenLinkController.create)
 )
