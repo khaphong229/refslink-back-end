@@ -2,7 +2,6 @@ import { shortenLink } from '@/app/middleware/common/client/shorten-link.middlew
 import ShortenLink from '@/models/client/shorten-link'
 import aqp from 'api-query-params'
 import { generateAlias } from '@/utils/generateAlias'
-import { abort } from '@/utils/helpers'
 
 export async function create(body, req) {
     const user_id = req.currentUser._id

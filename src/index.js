@@ -21,6 +21,7 @@ import { User } from './models'
 import routeAdmin from './routes/admin'
 import routeClient from './routes/client'
 import publicRedirectRouter from './routes/public-redirect.router.js'
+import generateScriptRouter from './routes/generateScript.js'
 
 function createApp() {
     // Init app
@@ -41,6 +42,7 @@ function createApp() {
     app.use(limiter)
     app.use(serveFavicon(path.join(PUBLIC_DIR, 'favicon.ico')))
     app.use('/static', express.static(PUBLIC_DIR))
+    app.use(express.static(path.join(process.cwd(), 'public')))
     app.use(helmet())
     app.use(express.json())
     app.use(express.urlencoded({extended: true}))
@@ -127,6 +129,9 @@ function createApp() {
     routeAdmin(app)
     //route client
     routeClient(app)
+
+    // API generate script
+    app.use('/api/generate-script', generateScriptRouter)
 
     // Public router for everyone
     app.use('/', publicRedirectRouter)

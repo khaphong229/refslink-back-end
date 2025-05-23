@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 import createModel from '../base'
 import {infoGeneralUser} from '../admin/admin'
-import { type } from 'os'
 
 const infoFulledUser = {
     ...infoGeneralUser,

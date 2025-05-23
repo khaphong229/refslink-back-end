@@ -99,3 +99,15 @@ export async function updateProfile(
 
     await currentUser.save()
 }
+
+export async function linkEmail(user, newEmail) {
+    const existingUser = await User.findOne({ email: newEmail })
+    if (existingUser) {
+        throw new Error('Email đã được liên kết với tài khoản khác.')
+    }
+
+    user.email = newEmail
+    await user.save()
+
+    return user
+}
