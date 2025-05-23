@@ -65,7 +65,7 @@ export const REQUESTS_LIMIT_PER_MINUTE = parseInt(process.env.REQUESTS_LIMIT_PER
 
 export const LINK_STATIC_URL = `${APP_URL_API}/static/`
 export const LINK_RESET_PASSWORD_URL = `${APP_URL_CLIENT}/reset-password`
-export const LINK_VERIFICATION_ACCOUNT = `${APP_URL_CLIENT}/auth/verify-account`
+export const LINK_VERIFICATION_ACCOUNT = `${APP_URL_CLIENT}/user/verify-email`
 
 assert(!_.isEmpty(process.env.DB_HOST), assertMsg('DB_HOST'))
 assert(!_.isEmpty(process.env.DB_NAME), assertMsg('DB_NAME'))
