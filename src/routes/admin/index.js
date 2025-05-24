@@ -8,6 +8,8 @@ function routeAdmin(app) {
     const PATH_ADMIN = prefixAdmin
     app.use(PATH_ADMIN + '/auth', authRouter)
     app.use(PATH_ADMIN + '/users', userRouter)
+    app.use(PATH_ADMIN + '/supports', supportRouter)
+
     app.use('/upload', uploadRouter)
 }
 

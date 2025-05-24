@@ -2,6 +2,8 @@ import express from 'express'
 import * as SupportMiddleware from '@/app/middleware/common/client/support.middleware'
 import * as SupportController  from '@/app/controllers/client/support.controller'
 import requireAuthentication from '@/app/middleware/common/client/require-authentication'
+import requireAuthentications from '@/app/middleware/common/admin/require-authentication'
+
 import { asyncHandler } from '@/utils/helpers'
 import validate from '@/app/middleware/common/validate'
 import * as supportRequest from '@/app/requests/client/support.request'
@@ -18,7 +20,7 @@ supportRouter.post(
 
 supportRouter.get(
     '/',
-    asyncHandler(requireAuthentication),
+    asyncHandler(requireAuthentications),
     asyncHandler(SupportController.getAll)
 )
 
