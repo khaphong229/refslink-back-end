@@ -1,9 +1,10 @@
+import { pick } from 'lodash'
 import * as shortenLinkService from '@/app/services/client/shorten-link.service'
 
-export const create = async (req, res) => {
+export async function create(req, res) {
     const data = await shortenLinkService.create(req.body, req)
-    console.log(data)
-    res.status(201).jsonify(data)
+    const filteredData = pick(data, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at'])
+    res.status(201).jsonify(filteredData)
 }
 
 export const getAll = async (req, res) => {
