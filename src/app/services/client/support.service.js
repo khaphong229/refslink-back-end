@@ -9,7 +9,7 @@ export const create = async (body, req) =>{
 }
 
 
-
+ 
 export async function getAll(queryParams) {
     const {filter: queryFilter, sort : querySort= {created_at:-1 }  } = aqp(queryParams)
     const searchConditions = {}

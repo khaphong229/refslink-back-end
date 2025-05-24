@@ -79,7 +79,6 @@ export const updateItem = Joi.object({
         .trim()
         .pattern(VALIDATE_PHONE_REGEX)
         .allow('')
-        .required()
         .label('Số điện thoại')
         .custom(
             (value, helpers) =>
