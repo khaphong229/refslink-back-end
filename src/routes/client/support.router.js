@@ -1,5 +1,4 @@
 import express from 'express'
-import * as SupportMiddleware from '@/app/middleware/common/client/support.middleware'
 import * as SupportController  from '@/app/controllers/client/support.controller'
 import requireAuthentication from '@/app/middleware/common/client/require-authentication'
 import { asyncHandler } from '@/utils/helpers'
