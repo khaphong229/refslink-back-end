@@ -1,21 +1,17 @@
 import aqp from 'api-query-params'
 import Support from '@/models/client/support'
 
-
-export const create = async (body, req) =>{
+export const create = async (body) => {
     const data = new Support(body)
     await data.save()
     return data
 }
 
-
- 
 export async function getAll(queryParams) {
-    const {filter: queryFilter, sort : querySort= {created_at:-1 }  } = aqp(queryParams)
+    const { filter: queryFilter, sort: querySort = { created_at: -1 } } = aqp(queryParams)
     const searchConditions = {}
     const limit = parseInt(queryFilter?.limit) || 10
-    const current = parseInt(queryFilter?.current)|| 1
-
+    const current = parseInt(queryFilter?.current) || 1
 
     if (queryFilter && Object.keys(queryFilter).length > 0) {
         if (queryFilter.q) {
@@ -34,9 +30,7 @@ export async function getAll(queryParams) {
 
         Object.entries(queryFilter).forEach(([key, value]) => {
             if (!['limit', 'current'].includes(key)) {
-                searchConditions[key] = typeof value === 'string'
-                    ? { $regex: value, $options: 'i' }
-                    : value
+                searchConditions[key] = typeof value === 'string' ? { $regex: value, $options: 'i' } : value
             }
         })
     }
@@ -51,6 +45,4 @@ export async function getAll(queryParams) {
     ])
 
     return { total, current, limit, data }
-
-
 }

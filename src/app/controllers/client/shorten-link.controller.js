@@ -41,3 +41,8 @@ export async function deleteByID(req, res) {
     if (!data) throw new Error('Không tìm thấy link để xóa')
     return res.status(200).jsonify('Xoá link rút gọn thành công.')
 }
+
+export async function goLink(req, res) {
+    const data = await shortenLinkService.goLink(req.body, req)
+    res.status(201).jsonify(data)
+}
