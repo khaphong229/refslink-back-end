@@ -7,7 +7,6 @@ const router = Router()
 router.post('/', requireAuthentication, async (req, res) => {
     const { type, domains, advert } = req.body
 
-    // Kiểm tra dữ liệu đầu vào
     if (!type || !domains || !Array.isArray(domains)) {
         return res.status(400).json({ error: 'type và domains là bắt buộc và domains phải là mảng' })
     }
@@ -18,7 +17,6 @@ router.post('/', requireAuthentication, async (req, res) => {
     }
 
     try {
-        // Lấy token từ DB
         const shortenTool = await ShortenTool.findOne({ user_id: userId }).exec()
         if (!shortenTool) {
             return res.status(404).json({ error: 'Token rút gọn không tìm thấy cho user này' })
@@ -26,6 +24,7 @@ router.post('/', requireAuthentication, async (req, res) => {
 
         // Cấu hình
         const app_url = 'http://localhost:3111/'
+        const app_type = JSON.stringify(type)
         const app_api_token = shortenTool.token
         const app_advert = typeof advert === 'number' ? advert : 2
         const app_domains = JSON.stringify(domains)
@@ -35,6 +34,7 @@ router.post('/', requireAuthentication, async (req, res) => {
 <script type="text/javascript">
     var app_url = '${app_url}';
     var app_api_token = '${app_api_token}';
+    var app_type = ${app_type};
     var app_advert = ${app_advert};
     var app_domains = ${app_domains};
 </script>
