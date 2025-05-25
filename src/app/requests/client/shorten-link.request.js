@@ -2,7 +2,7 @@ import { MAX_STRING_SIZE } from '@/configs'
 import Joi from 'joi'
 
 export const create = Joi.object({
-    alias: Joi.string().min(6).label('ALIAS của link rút gọn'),
+    alias: Joi.string().min(6).label('ALIAS của link rút gọn').allow(''),
     title: Joi.string().min(3).max(100).label('Tiêu đề của link rút gọn'),
     original_link: Joi.string().min(6).max(MAX_STRING_SIZE).required().label('Link gốc cần rút gọn'),
     shorten_link: Joi.string().min(6).default('').label('Link rút gọn'),
