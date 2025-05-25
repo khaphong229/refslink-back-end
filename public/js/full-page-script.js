@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    const token = window.app_api_token || app_api_token;
     const links = Array.from(document.querySelectorAll('a'));
     const urls = links
         .map(a => a.getAttribute('href'))
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                token: 'ACMiEvKW7lWO7yf2dRyFFDMbqP7rozUB',
+                token,
                 urls,
             }),
         });
