@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import requireAuthentication from '@/app/middleware/common/admin/require-authentication'
+import requireAuthentications from '@/app/middleware/common/admin/require-authentication'
 import validate from '@/app/middleware/common/validate'
 import * as authMiddleware from '../../app/middleware/auth.middleware'
 import * as authRequest from '../../app/requests/admin/auth.request'
@@ -16,20 +16,20 @@ authRouter.post(
     asyncHandler(authController.register)
 )
 
-authRouter.post('/logout', asyncHandler(requireAuthentication), asyncHandler(authController.logout))
+authRouter.post('/logout', asyncHandler(requireAuthentications), asyncHandler(authController.logout))
 
-authRouter.get('/me', asyncHandler(requireAuthentication), asyncHandler(authController.me))
+authRouter.get('/me', asyncHandler(requireAuthentications), asyncHandler(authController.me))
 
 authRouter.put(
     '/me',
-    asyncHandler(requireAuthentication),
+    asyncHandler(requireAuthentications),
     asyncHandler(validate(authRequest.updateProfile)),
     asyncHandler(authController.updateProfile)
 )
 
 authRouter.patch(
     '/change-password',
-    asyncHandler(requireAuthentication),
+    asyncHandler(requireAuthentications),
     asyncHandler(validate(authRequest.changePassword)),
     asyncHandler(authController.changePassword)
 )

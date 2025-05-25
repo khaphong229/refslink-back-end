@@ -5,7 +5,7 @@ import {tokenBlocklist} from '@/app/services/admin/auth.service'
 import {TOKEN_TYPE} from '@/configs'
 import {abort, getToken, verifyToken} from '@/utils/helpers'
 
-async function requireAuthentication(req, res, next) {
+async function requireAuthentications(req, res, next) {
     try {
         const token = getToken(req.headers)
         if (token) {
@@ -31,4 +31,4 @@ async function requireAuthentication(req, res, next) {
     abort(401)
 }
 
-export default requireAuthentication
+export default requireAuthentications
