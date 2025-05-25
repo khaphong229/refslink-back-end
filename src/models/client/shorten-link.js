@@ -3,7 +3,6 @@ import createModel, { ObjectId } from '../base'
 const ShortenLinkSchema = {
     api_web_id: {
         type: ObjectId,
-        require: true,
         ref: 'ApiWebs',
     },
     user_id: {

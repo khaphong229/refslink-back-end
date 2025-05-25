@@ -1,6 +1,7 @@
 import ApiWebs from '@/models/client/api-webs'
 import ShortenLink from '@/models/client/shorten-link'
 import { abort } from '@/utils/helpers'
+import { pick } from 'lodash'
 import { isValidObjectId } from 'mongoose'
 
 export async function checkShortenLink(req, res, next) {
@@ -9,7 +10,9 @@ export async function checkShortenLink(req, res, next) {
     const result = await ShortenLink.findOne({ original_link: url, user_id: req.currentUser._id })
 
     if (result) {
-        abort(404, 'Link đã được rút gọn.')
+        const filteredData = pick(result, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at'])
+        res.status(201).jsonify(filteredData)
+        return
     } else {
         next()
         return
@@ -45,7 +48,7 @@ export async function checkId(req, res, next) {
         if (data) {
             req.data = data
             next()
-            return   
+            return
         }
     }
     abort(404, 'Link rút gọn không tồn tại')
