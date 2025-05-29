@@ -1,4 +1,4 @@
-import * as shortenLinkRankingUserService from '@/app/services/client/shorten-link-ranking.user.service'
+import * as shortenLinkRankingUserService from '@/app/services/client/shorten-link-ranking.client.service'
 
 export const getShortenLinksRankingUser = async (req, res) => {
     const { sortBy = 'click_count', limit = 10 } = req.query

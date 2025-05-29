@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { asyncHandler } from '@/utils/helpers'
 import requireAuthentication from '@/app/middleware/common/client/require-authentication'
-import * as shortenLinkRankingUserController from '@/app/controllers/client/shorten-link-ranking.user.controller'
+import * as shortenLinkRankingUserController from '@/app/controllers/client/shorten-link-ranking.client.controller'
 
 const shortenLinkRankingUserRouter = Router()
 
