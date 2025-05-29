@@ -50,3 +50,14 @@ export async function shortenBulkUrls(req, res) {
         res.status(500).jsonify(error)
     }
 }
+
+// export function fullPageScriptHandler(req, res) {
+//     try {
+//         const apiToken = req.currentUser.api_token
+//         if (!apiToken) {
+//             return res.status(404).json({ success: false, message: 'No API token found for this user' })
+//         }
+//     } catch (err) {
+//         res.status(500).json({ success: false, message: err.message })
+//     }
+// }

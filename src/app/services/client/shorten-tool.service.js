@@ -1,6 +1,7 @@
 import { generateTokenAPI } from '@/utils/generateAlias'
 import ShortenTool from '@/models/client/shorten-tool'
 import * as shortenLinkService from '@/app/services/client/shorten-link.service'
+// import axios from 'axios'
 
 export async function getOrCreateToken(userId) {
     let tool = await ShortenTool.findOne({ user_id: userId })
@@ -56,3 +57,21 @@ export async function shortenBulkUrls(req, token, urls) {
 
     return results
 }
+
+// export async function fullPageScriptHandler(req, token) {
+//     try {
+//         const apiToken = req.currentUser.api_token
+//         if (!apiToken) {
+//             return res.status(404).json({ success: false, message: 'No API token found for this user' })
+//         }
+//         const urls = []
+
+//         const response = await shortenBulkUrls(req, token,)
+
+
+//         res.json(response.data)
+//     } catch (err) {
+//         res.status(500).json({ success: false, message: err.message })
+//     }
+// }
+

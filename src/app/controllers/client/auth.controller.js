@@ -8,14 +8,18 @@ import jwt from 'jsonwebtoken'
 import { User } from '@/models'
 
 export async function login(req, res) {
-    const [validLogin, result] = await authService.checkValidLogin(req.body)
+    const [validLogin, user] = await authService.checkValidLogin(req.body)
 
-    if (validLogin) {
-        res.jsonify(authService.authToken(result))
-    } else {
-        abort(400, result)
+    if (!validLogin) {
+        return abort(400, user) 
     }
+
+    const token = authService.authToken(user)
+
+    res.jsonify(token)
 }
+
+
 
 export async function register(req, res) {
     const newUser = await authService.register(req.body)
@@ -141,3 +145,5 @@ export async function loginSuccess(req, res) {
         })
     }
 }
+
+
