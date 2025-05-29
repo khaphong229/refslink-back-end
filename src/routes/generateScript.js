@@ -41,7 +41,12 @@ router.post('/', requireAuthentication, async (req, res) => {
 <script src="${app_url}js/full-page-script.js"></script>
         `.trim()
 
-        res.set('Content-Type', 'text/javascript').send(scriptContent)
+        res.set('Content-Type', 'application/json').json({
+            status: 200,
+            success: true,
+            message: 'OK',
+            data: scriptContent
+        })
 
     } catch (error) {
         console.error('Lỗi server:', error)
