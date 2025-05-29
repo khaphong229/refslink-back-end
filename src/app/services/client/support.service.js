@@ -10,14 +10,17 @@ export const create = async (body) => {
 export async function getAll(queryParams) {
     const { filter: queryFilter, sort: querySort = { created_at: -1 } } = aqp(queryParams)
     const searchConditions = {}
+
+    // Ưu tiên lấy page, nếu không có thì lấy current, mặc định là 1
     const limit = parseInt(queryFilter?.limit) || 10
-    const current = parseInt(queryFilter?.current) || 1
+    const current = parseInt(queryFilter?.page || queryFilter?.current) || 1
 
     if (queryFilter && Object.keys(queryFilter).length > 0) {
         if (queryFilter.q) {
             const searchValue = queryFilter.q
             delete queryFilter.limit
             delete queryFilter.current
+            delete queryFilter.page
             delete queryFilter.q
 
             searchConditions.$or = [
@@ -29,7 +32,7 @@ export async function getAll(queryParams) {
         }
 
         Object.entries(queryFilter).forEach(([key, value]) => {
-            if (!['limit', 'current'].includes(key)) {
+            if (!['limit', 'current', 'page'].includes(key)) {
                 searchConditions[key] = typeof value === 'string' ? { $regex: value, $options: 'i' } : value
             }
         })
