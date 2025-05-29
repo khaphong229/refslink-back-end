@@ -15,17 +15,17 @@ export async function filter({q, page, per_page, field, sort_order}) {
         ...(q && {$or: [{name: q}, {email: q}, {phone: q}]}),
     }
 
-    const users = await User.find(filter)
-        .skip((page - 1) * per_page)
+    const data = await User.find(filter)
+        .skip((page - 1) * per_page) 
         .limit(per_page)
         .sort({[field]: sort_order})
 
-    users.forEach(function (user) {
+    data.forEach(function (user) {
         user.avatar = user.avatar && LINK_STATIC_URL + user.avatar
     })
 
     const total = await User.countDocuments(filter)
-    return {total, page, per_page, users}
+    return {total, page, per_page, data}
 }
 
 export async function details(userId) {
@@ -34,10 +34,11 @@ export async function details(userId) {
     return user
 }
 
-export async function update(user, {name, email, phone}) {
+export async function update(user, {name, email, phone,status}) {
     user.name = name
     user.email = email
     user.phone = phone
+    user.status = status
     await user.save()
 }
 

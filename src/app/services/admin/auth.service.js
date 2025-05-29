@@ -1,6 +1,6 @@
 import moment from 'moment'
 import jwt from 'jsonwebtoken'
-import {User} from '@/models'
+import {Admin} from '@/models'
 import {cache, LOGIN_EXPIRE_IN, LINK_STATIC_URL, TOKEN_TYPE} from '@/configs'
 import {FileUpload} from '@/utils/classes'
 import {generateToken} from '@/utils/helpers'
@@ -8,12 +8,11 @@ import {generateToken} from '@/utils/helpers'
 export const tokenBlocklist = cache.create('token-block-list')
 
 export async function checkValidLogin({email, password}) {
-    const user = await User.findOne({email: email})
-
-    if (user) {
-        const verified = user.verifyPassword(password)
+    const admin = await Admin.findOne({email: email})
+    if (admin) {
+        const verified = admin.verifyPassword(password)
         if (verified) {
-            return user
+            return admin
         }
     }
 
@@ -33,11 +32,11 @@ export function authToken(user) {
 
 export async function register({avatar, ...requestBody}) {
     if (avatar instanceof FileUpload) {
-        requestBody.avatar = avatar.save()
+        requestBody.avatar = avatar.save('avatar')
     }
 
-    const user = new User(requestBody)
-    return await user.save()
+    const admin = new Admin(requestBody)
+    return await admin.save()
 }
 
 export async function blockToken(token) {
@@ -48,9 +47,9 @@ export async function blockToken(token) {
 }
 
 export async function profile(userId) {
-    const user = await User.findOne({_id: userId})
-    user.avatar = user.avatar && LINK_STATIC_URL + user.avatar
-    return user
+    const admin = await Admin.findOne({_id: userId})
+    admin.avatar = admin.avatar && LINK_STATIC_URL + admin.avatar
+    return admin
 }
 
 export async function updateProfile(currentUser, {name, email, phone, avatar}) {

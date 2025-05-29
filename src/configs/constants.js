@@ -24,13 +24,15 @@ export const NODE_ENV = Object.values(APP_ENV).includes(process.env.NODE_ENV)
     ? process.env.NODE_ENV
     : APP_ENV.PRODUCTION
 
+// swagger
+
 // Loads `.env` file contents into process.env
 dotenv.config({
-    path: [
-        path.join(APP_DIR, `.env.${NODE_ENV}`),
-        path.join(APP_DIR, '.env')
-    ],
+    path: [path.join(APP_DIR, `.env.${NODE_ENV}`), path.join(APP_DIR, '.env')],
 })
+
+//others
+export const PRICE_PER_VIEW_MONEY = process.env.PRICE_PER_VIEW
 
 // environment
 export const APP_DEBUG = NODE_ENV === APP_ENV.DEVELOPMENT
@@ -44,7 +46,9 @@ export const APP_URL_CLIENT = process.env.APP_URL_CLIENT
 assert(!_.isEmpty(APP_URL_CLIENT), assertMsg('APP_URL_CLIENT'))
 
 export const OTHER_URLS_CLIENT = process.env.OTHER_URLS_CLIENT
-    ? JSON.parse(process.env.OTHER_URLS_CLIENT)
+    ? process.env.OTHER_URLS_CLIENT.startsWith('[')
+        ? JSON.parse(process.env.OTHER_URLS_CLIENT)
+        : [process.env.OTHER_URLS_CLIENT]
     : []
 assert(_.isArray(OTHER_URLS_CLIENT), 'OTHER_URLS_CLIENT must be an array.')
 
@@ -54,10 +58,14 @@ assert(!_.isEmpty(SECRET_KEY), assertMsg('SECRET_KEY'))
 export const LOGIN_EXPIRE_IN = process.env.LOGIN_EXPIRE_IN
 assert(!_.isEmpty(LOGIN_EXPIRE_IN), assertMsg('LOGIN_EXPIRE_IN'))
 
+export const VERIFY_EMAIL_EXPIRE_IN = process.env.VERIFY_EMAIL_EXPIRE_IN
+assert(!_.isEmpty(VERIFY_EMAIL_EXPIRE_IN), assertMsg('VERIFY_EMAIL_EXPIRE_IN'))
+
 export const REQUESTS_LIMIT_PER_MINUTE = parseInt(process.env.REQUESTS_LIMIT_PER_MINUTE, 10) || 1000
 
 export const LINK_STATIC_URL = `${APP_URL_API}/static/`
 export const LINK_RESET_PASSWORD_URL = `${APP_URL_CLIENT}/reset-password`
+export const LINK_VERIFICATION_ACCOUNT = `${APP_URL_CLIENT}/user/verify-email`
 
 assert(!_.isEmpty(process.env.DB_HOST), assertMsg('DB_HOST'))
 assert(!_.isEmpty(process.env.DB_NAME), assertMsg('DB_NAME'))
@@ -85,6 +93,11 @@ assert(!_.isEmpty(MAIL_PORT), assertMsg('MAIL_PORT'))
 assert(!_.isEmpty(MAIL_USERNAME), assertMsg('MAIL_USERNAME'))
 assert(!_.isEmpty(MAIL_PASSWORD), assertMsg('MAIL_PASSWORD'))
 
+export const CLIENT_ID = process.env.CLIENT_ID
+export const CLIENT_SECRET = process.env.CLIENT_SECRET
+
+export const PRICE_PER_VIEW = 20
+
 // other
 export const TOKEN_TYPE = {
     AUTHORIZATION: 'AUTHORIZATION',
@@ -105,8 +118,8 @@ export const STATUS_DEFAULT_MESSAGE = {
 export const JOI_DEFAULT_OPTIONS = {
     abortEarly: false,
     errors: {
-        wrap: {label: false},
-        language: {'any.exists': 'any.exists'},
+        wrap: { label: false },
+        language: { 'any.exists': 'any.exists' },
     },
     externals: false,
     stripUnknown: true,
@@ -158,4 +171,4 @@ export const JOI_DEFAULT_OPTIONS = {
 
 export const VALIDATE_PHONE_REGEX = /^(0[235789])[0-9]{8}$/
 export const VALIDATE_PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_])/
-export const VALIDATE_FULL_NAME_REGEX = /^[a-zA-ZÀ-ỹ ]+$/
+export const VALIDATE_FULL_NAME_REGEX = /^[a-zA-ZÀ-ỹ-Z0-9]+$/
