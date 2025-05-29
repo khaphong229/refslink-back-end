@@ -1,4 +1,5 @@
 import * as ShortenToolService from '@/app/services/client/shorten-tool.service'
+import { pick } from 'lodash'
 
 export async function getOrCreateToken(req, res) {
     try {
@@ -23,9 +24,10 @@ export async function shortenUrl(req, res) {
                 message: 'API token and URL are required',
             })
         }
-
-        const results = await ShortenToolService.shortenUrl(req)
-        res.status(201).jsonify(results)
+        
+        const result = await ShortenToolService.shortenUrl(req)
+        const filteredData = pick(result, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at'])
+        res.status(201).jsonify(filteredData)
     } catch (error) {
         res.status(500).jsonify(error)
     }

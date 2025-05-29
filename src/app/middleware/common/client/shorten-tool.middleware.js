@@ -1,5 +1,7 @@
 import ShortenTool from '@/models/client/shorten-tool'
 import User from '@/models/client/user'
+import * as shortenLinkMiddleWare from '@/app/middleware/common/client/shorten-link.middleware'
+
 
 export async function validateGetTokenRequest(req, res, next) {
     const userId = req.currentUser?._id
@@ -53,7 +55,7 @@ export async function validateShortenToolRequest(req, res, next) {
     req.body.original_link = url
     req.token = token
 
-    next()
+    return await shortenLinkMiddleWare.checkShortenLink(req, res, next)
 }
 
 export async function validateBulkShortenRequest(req, res, next) {
