@@ -42,4 +42,6 @@ shortenLinkRouter.delete(
 
 shortenLinkRouter.post('/go', asyncHandler(shortenLinkController.goLink))
 
+shortenLinkRouter.post('/go/link', asyncHandler(shortenLinkController.goLinkValid))
+
 export default shortenLinkRouter
