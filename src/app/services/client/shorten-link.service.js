@@ -38,6 +38,26 @@ export async function getAll(queryParams, req) {
     const limit = queryFilter?.limit || 10
     const page = queryFilter?.page || 1
 
+
+    if (queryFilter?.status) {
+        searchConditions.status = queryFilter.status
+        delete queryFilter.status
+    } else {
+        searchConditions.status = 'active'
+    }
+
+    if (queryFilter?.startDate || queryFilter?.endDate) {
+        searchConditions.created_at = {}
+        if (queryFilter.startDate) {
+            searchConditions.created_at.$gte = new Date(queryFilter.startDate)
+        }
+        if (queryFilter.endDate) {
+            searchConditions.created_at.$lte = new Date(queryFilter.endDate)
+        }
+        delete queryFilter.startDate
+        delete queryFilter.endDate
+    }
+
     if (queryFilter && Object.keys(queryFilter).length > 0) {
         if (queryFilter.q) {
             const searchValue = queryFilter.q
