@@ -45,7 +45,10 @@ router.post('/', requireAuthentication, async (req, res) => {
             status: 200,
             success: true,
             message: 'OK',
-            data: scriptContent
+            data: {
+                total: Array.isArray(domains) ? domains.length : 0,
+                data: scriptContent
+            }
         })
 
     } catch (error) {
