@@ -6,7 +6,7 @@
   "engines": {
     "node": ">=20"
   },
-  "main": "src/main.js", 
+  "main": "src/main.js",
   "scripts": {
     "start": "cross-env BUILD_MODE=dev nodemon",
     "production": "cross-env BUILD_MODE=production nodemon",
@@ -24,6 +24,7 @@
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "cron": "^3.1.7",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",

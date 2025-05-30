@@ -46,3 +46,8 @@ export async function goLink(req, res) {
     const data = await shortenLinkService.goLink(req.body, req)
     res.status(201).jsonify(data)
 }
+
+export async function goLinkValid(req, res) {
+    const data = await shortenLinkService.goLinkValid(req.body, req)
+    res.status(201).jsonify(data)
+}

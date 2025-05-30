@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt'
 import createModel from '../base'
-import {infoGeneralUser} from '../admin/admin'
-import { type } from 'os'
+import { infoGeneralUser } from '../admin/admin'
 
 const infoFulledUser = {
     ...infoGeneralUser,
@@ -13,7 +12,7 @@ const infoFulledUser = {
         required: true,
         default: 'inactive',
     },
-    avatar:{
+    avatar: {
         type: String,
         default: 'https://res.cloudinary.com/dqj0xgk8v/image/upload/v1695860982/avater/avater-default.png',
     },
@@ -36,8 +35,8 @@ const infoFulledUser = {
         type: Number,
         default: 0,
     },
-    phone:{
-        type: String, 
+    phone: {
+        type: String,
     },
     total_earned: {
         type: Number,
@@ -63,7 +62,7 @@ const User = createModel('User', 'users', infoFulledUser, {
         virtuals: false,
         transform(doc, ret) {
             // eslint-disable-next-line no-unused-vars
-            const {password, ...result} = ret
+            const { password, ...result } = ret
             return result
         },
     },

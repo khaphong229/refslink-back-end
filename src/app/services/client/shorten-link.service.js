@@ -97,6 +97,27 @@ export async function goLink(body) {
     const dataLink = await ShortenLink.findOne({ alias: alias })
     if (!dataLink) return null
 
+    if (dataLink.api_web_id) {
+        const apiWeb = await ApiWebs.findById(dataLink.api_web_id).select('name_api description').lean()
+
+        return {
+            link: dataLink.third_party_link,
+            name: apiWeb.name_api,
+            description: apiWeb.description,
+        }
+    }
+
+    return {
+        link: dataLink.original_link,
+        name: '',
+    }
+}
+
+export async function goLinkValid(body) {
+    const alias = body.alias
+    const dataLink = await ShortenLink.findOne({ alias: alias })
+    if (!dataLink) return null
+
     await ShortenLink.findByIdAndUpdate(dataLink._id, {
         $set: {
             click_count: (dataLink.click_count || 0) + 1,
@@ -104,17 +125,8 @@ export async function goLink(body) {
         },
     })
 
-    if (dataLink.api_web_id) {
-        const apiWeb = await ApiWebs.findById(dataLink.api_web_id).select('name_api').lean()
-
-        return {
-            link: dataLink.third_party_link,
-            name: apiWeb.name_api,
-        }
-    }
-
     return {
-        link: dataLink.original_link,
-        name: '',
+        success: true,
+        message: 'Success',
     }
 }
