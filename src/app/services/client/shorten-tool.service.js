@@ -47,9 +47,10 @@ export async function shortenBulkUrls(req, token, urls) {
             if (await shortenLinkMiddleware.checkValidLink(url)) {
                 
                 let data = await ShortenLink.findOne({original_link : url, user_id : req.currentUser.id})
+                req.body.alias = null 
+                
                 if (!data) {
                     data = await shortenLinkService.create(req.body, req)
-                    console.log(req.body.alias)
                 }
 
                 const filteredData = pick(data, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at'])
