@@ -127,7 +127,7 @@ authRouter.post(
 authRouter.post(
     '/verify-email/:token',
     asyncHandler(authMiddleware.verifyEmailToken),
-    asyncHandler(authController.verifyAccount)
+    asyncHandler(authController.verifyEmailToken)
 )
   
 /**
