@@ -44,6 +44,7 @@
     "nodemailer": "^6.9.14",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "qrcode": "^1.5.4",
     "serve-favicon": "^2.5.0",
     "short-uuid": "^5.2.0",
     "source-map-support": "^0.5.21",

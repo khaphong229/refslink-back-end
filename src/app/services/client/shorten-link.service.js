@@ -4,6 +4,7 @@ import aqp from 'api-query-params'
 import { generateAlias } from '@/utils/generateAlias'
 import { APP_URL_CLIENT } from '@/configs'
 import ApiWebs from '@/models/client/api-webs'
+import QRCode from 'qrcode'
 
 
 export async function create(body, req) {
@@ -137,5 +138,30 @@ export async function goLink(body) {
     return {
         link: dataLink.original_link,
         name: '',
+    }
+}
+
+export async function generateQRCode(link) {
+    try {
+        return await QRCode.toDataURL(link)
+    } catch (err) {
+        throw new Error('Không thể tạo QR code')
+    }
+}
+
+export async function getOrCreateShortenLinkQRCode(original_link, req) {
+    let data = await ShortenLink.findOne({ original_link, user_id: req.currentUser._id })
+    if (!data) {
+        req.body.original_link = original_link
+        data = await create(req.body, req)
+    }
+    const qr = await generateQRCode(data.shorten_link)
+    return {
+        _id: data._id,
+        alias: data.alias,
+        shorten_link: data.shorten_link,
+        qrcode: qr,
+        created_at: data.created_at,
+        updated_at: data.updated_at
     }
 }
