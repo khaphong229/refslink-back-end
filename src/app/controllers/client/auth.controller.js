@@ -2,8 +2,6 @@ import { LINK_RESET_PASSWORD_URL, LINK_VERIFICATION_ACCOUNT, TOKEN_TYPE } from '
 import { abort, generateToken, getToken } from '@/utils/helpers'
 import * as authService from '../../services/client/auth.service'
 import * as userService from '../../services/admin/user.service'
-// controllers/auth.controller.js
-
 import jwt from 'jsonwebtoken'
 import { User } from '@/models'
 
@@ -35,14 +33,6 @@ export async function register(req, res) {
     res.status(200).jsonify('Gửi yêu cầu xác minh tài khoản thành công! Vui lòng kiểm tra email.')
 }
 
-export async function verifyAccount(req, res) {
-    await authService.updateProfile(req.currentUser, {
-        name: req.currentUser.name,
-        email: req.currentUser.email,
-        status: 'active',
-    })
-    res.status(200).jsonify('Xác minh tài khoản thông qua email thành công!')
-}
 
 
 
@@ -50,8 +40,7 @@ export async function verifyEmailToken(req, res) {
     const { token } = req.params
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findById(payload.user_id)
-        console.log(user)
+        const user = await User.findById(payload.data.user_id)
         if (!user) return res.status(404).jsonify('Không tìm thấy người dùng')
 
         // Cập nhật trạng thái
