@@ -14,7 +14,7 @@ export async function getOrCreateToken(req, res) {
     }
 }
 
-export async function shortenUrl(req, res) {
+export async function shortenUrl(req, res, type = null) {
     try {
         const { token, url } = req.query
 
@@ -24,10 +24,14 @@ export async function shortenUrl(req, res) {
                 message: 'API token and URL are required',
             })
         }
-        
+
         const result = await ShortenToolService.shortenUrl(req)
         const filteredData = pick(result, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at'])
-        res.status(201).jsonify(filteredData)
+        if (type === null) {
+            res.status(201).jsonify(filteredData)
+        } else {
+            res.redirect(result.shorten_link)
+        }
     } catch (error) {
         res.status(500).jsonify(error)
     }
@@ -35,17 +39,16 @@ export async function shortenUrl(req, res) {
 
 export async function shortenBulkUrls(req, res) {
     try {
-        const token = req.body.token
         const urls = req.body.urls
 
-        if (!token || !urls || !Array.isArray(urls)) {
+        if (!urls || !Array.isArray(urls)) {
             return res.status(400).json({
                 success: false,
-                message: 'API token and array of URLs are required',
+                message: 'Array of URLs is required',
             })
         }
 
-        const results = await ShortenToolService.shortenBulkUrls(req, token, urls)
+        const results = await ShortenToolService.shortenBulkUrls(req, res, urls)
 
         res.status(201).jsonify(results)
     } catch (error) {
