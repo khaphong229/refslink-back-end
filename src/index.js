@@ -17,7 +17,6 @@ import errorHandler from './handlers/error.handler'
 import passport from 'passport'
 import {Strategy} from 'passport-google-oauth20'
 import { User } from './models'
-import crypto from 'crypto'
 
 import routeAdmin from './routes/admin'
 import routeClient from './routes/client'

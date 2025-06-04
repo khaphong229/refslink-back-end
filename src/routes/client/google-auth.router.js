@@ -5,6 +5,7 @@ import { googleCallback, registerWithGoogle } from '../../app/controllers/client
 const router = Router()
 
 // Middleware xử lý lỗi
+// eslint-disable-next-line no-unused-vars
 const handleError = (err, req, res, next) => {
     console.error('Google auth error:', err)
     res.status(500).json({
