@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import createModel from '../base'
+import createModel, { ObjectId } from '../base'
 import { infoGeneralUser } from '../admin/admin'
 import { required } from 'joi'
 
@@ -52,12 +52,14 @@ const infoFulledUser = {
     },
     ref_code: {
         type: String,
-        required:false
+        required: false,
+        unique: true, 
+
     },
     ref_by: {
-        type: Number,
+        type: ObjectId,
         required: false,
-        
+        ref: 'User'
     },
 }
 

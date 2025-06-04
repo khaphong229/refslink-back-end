@@ -1,4 +1,3 @@
-import { required } from 'joi'
 import createModel, { ObjectId } from '../base'
 
 
@@ -11,11 +10,13 @@ const ReferralSchema = {
         type:ObjectId,
         required: true,
         ref: 'User',
+        unique:true,
 
     },
     user_ref:{
-        type:Array,
+        type:[ObjectId],
         default: [],
+        ref:'User'
         
     },
     total_earings:{

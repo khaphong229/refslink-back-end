@@ -32,48 +32,18 @@ export function authToken(user) {
     }
 }
 
-export async function register({ avatar,ref, ...requestBody }) {
+export async function register({ avatar,  ...requestBody }) {
     if (avatar instanceof FileUpload) {
         requestBody.avatar = avatar.save('avatar')
     }
 
-    requestBody.ref_code = requestBody.email.split('@')[0] + Math.floor(Math.random() * 10000) // Generate a unique ref_code
-
-    let ref_by = null
-    if(ref) {
-        const referrer = await User.findOne({ref_code: ref})
-        if(referrer) {
-            ref_by = referrer._id
-            requestBody.ref_by = ref_by
-
-            await Referral.updateOne(
-                {user_id: ref_by},
-                {
-                    $push: { user_ref: requestBody._id },
-                    $inc: { total_earings: 0 } // Assuming you want to initialize total_earings
-                },
-                { upsert: true }
-            )
-
-            // cộng tiền
-            await User.updateOne(
-                { _id: ref_by },
-                { $inc: { balance: 0 } } // Assuming you want to initialize balance increment
-            )
-        }
-        
+    const user = new User(requestBody)
+    if (!user.ref_code) {
+        // user.ref_code = generateRefCode(user._id) // hoặc random string
+        // const savedUser = await user.save()
+    
     }
 
-
-    const user = new User(requestBody)
-
-
-    await Referral.create({
-        ref_link: `https://yourapp.com/register?ref=${requestBody.ref_code}`,
-        user_id: user._id,
-        user_ref: [],
-        total_earings: 0
-    })
 
     return await user.save()
 }
