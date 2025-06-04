@@ -36,6 +36,10 @@ const ShortenLinkSchema = {
         type: Number,
         default: 0,
     },
+    current_view: {
+        type: Number,
+        default: 0,
+    },
     earned_amount: {
         type: Number,
         default: 0,
@@ -51,6 +55,11 @@ const ShortenLinkSchema = {
     status: {
         type: String,
         default: 'active',
+    },
+    api_used_list: {
+        type: [ObjectId],
+        ref: 'ApiWebs',
+        default: [],
     },
 }
 

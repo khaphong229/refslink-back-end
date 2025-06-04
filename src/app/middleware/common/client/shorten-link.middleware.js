@@ -226,11 +226,27 @@ export async function getApiWebActive(req, res, next) {
         req.apiWebActive = null
         next()
         return
-        // return abort(404, 'Không tìm thấy api web nào đang hoạt động.')
     }
+
+    const now = new Date()
+    data = data.filter(api => {
+
+        if (typeof api.max_view === 'number' && typeof api.current_view === 'number' && api.current_view >= api.max_view) return false
+
+        if (api.timer && api.timer_start && api.timer_end) {
+            if (!(now >= api.timer_start && now <= api.timer_end)) return false
+        }
+        return true
+    })
+
+    if (!data || data.length === 0) {
+        req.apiWebActive = null
+        next()
+        return
+    }
+    
     data = data.sort((a, b) => a.priority - b.priority)
     req.apiWebActive = data[0]
-
     next()
     return
 }

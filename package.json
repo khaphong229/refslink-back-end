@@ -32,6 +32,7 @@
     "express-session": "^1.18.1",
     "fastq": "^1.17.1",
     "file-system-cache": "^2.4.4",
+    "geoip-lite": "^1.4.10",
     "helmet": "^7.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
