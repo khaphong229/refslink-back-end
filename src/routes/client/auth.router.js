@@ -33,11 +33,14 @@ authRouter.get(
         failureRedirect: '/auth/login?error=google_auth_failed',
     }),
     (req, res) => {
+        console.log('Print REQ')
+        console.log(req.user)
+        console.log('Print RES')
+        // console.log(res)   
         try {
-            // Check if user is available in the request
             if (!req.user) {
                 console.error('No user found in request after Google authentication')
-                return res.status(400).jsonify({
+                return res.status(400).json({  // sửa jsonify thành json
                     status: 400,
                     success: false,
                     message: 'Không tìm thấy thông tin người dùng sau khi xác thực Google',
@@ -45,13 +48,12 @@ authRouter.get(
                 })
             }
 
-            // Tạo token JWT cho user
             const result = authService.authToken(req.user)
 
             console.log('Authentication successful. Returning token...')
+            console.log(result)
 
-            // Trả về response theo định dạng yêu cầu
-            res.status(200).jsonify({
+            res.status(200).json({   // sửa jsonify thành json
                 status: 200,
                 success: true,
                 message: 'Login successful',
@@ -60,7 +62,7 @@ authRouter.get(
                     expires_in: result.expire_in,
                     token_type: 'Bearer',
                     user: {
-                        id: req.user._id.toString(),
+                        id: req.user._id,
                         name: req.user.name || req.user.full_name || '',
                         email: req.user.email || '',
                         avatar: req.user.avatar || '',
@@ -69,7 +71,7 @@ authRouter.get(
             })
         } catch (error) {
             console.error('Error in Google callback:', error)
-            res.status(500).jsonify({
+            res.status(500).json({   // sửa jsonify thành json
                 status: 500,
                 success: false,
                 message: 'Đã xảy ra lỗi khi xử lý đăng nhập Google',
@@ -78,6 +80,7 @@ authRouter.get(
         }
     }
 )
+
 
 authRouter.get('/me', asyncHandler(requireAuthentication), asyncHandler(authController.me))
 

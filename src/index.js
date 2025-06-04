@@ -3,7 +3,7 @@ import path from 'path'
 import serveFavicon from 'serve-favicon'
 import helmet from 'helmet'
 import multer from 'multer'
-import {APP_DEBUG, CLIENT_ID, CLIENT_SECRET, NODE_ENV, PUBLIC_DIR, VIEW_DIR} from './configs'
+import {APP_DEBUG, CLIENT_ID, CLIENT_SECRET, NODE_ENV, PUBLIC_DIR, VIEW_DIR, APP_URL_API} from './configs'
 import {setupSwagger} from './configs/swagger'
   
 import {jsonify, sendMail} from './handlers/response.handler'
@@ -17,11 +17,13 @@ import errorHandler from './handlers/error.handler'
 import passport from 'passport'
 import {Strategy} from 'passport-google-oauth20'
 import { User } from './models'
+import crypto from 'crypto'
 
 import routeAdmin from './routes/admin'
 import routeClient from './routes/client'
 import publicRedirectRouter from './routes/public-redirect.router.js'
 import generateScriptRouter from './routes/generateScript.js'
+import googleAuthRouter from './routes/client/google-auth.router.js'
 
 function createApp() {
     // Init app
@@ -53,19 +55,18 @@ function createApp() {
     // Setup Swagger documentation
     setupSwagger(app)
 
-    // Đảm bảo passport được khởi tạo trước khi sử dụng
     app.use(passport.initialize())
 
     passport.use(
         new Strategy(
             {
-                callbackURL: '/auth/google/callback',
+                callbackURL: `${APP_URL_API}/auth/google/callback`,
                 clientID: CLIENT_ID,
                 clientSecret: CLIENT_SECRET,
             },
             async (accessToken, refreshToken, profile, done) => {
                 try {
-                    console.log('Google profile received:', profile.id, profile.displayName)
+                    console.log('Google profile received:', profile)
                     
                     // Tìm user theo googleId
                     let user = await User.findOne({ googleId: profile.id })
@@ -87,22 +88,26 @@ function createApp() {
                             console.log('Updated existing user with Google ID:', user._id)
                             return done(null, user)
                         }
+
+                        // Tạo tài khoản mới từ thông tin Google
+                        const newUser = new User({
+                            email: email,
+                            googleId: profile.id,
+                            name: profile.displayName,
+                            avatar: profile.photos?.[0]?.value,
+                            isActive: true,
+                            isVerified: true, // Email đã được xác thực bởi Google
+                            password: '12345678', // Mật khẩu mặc định
+                            status: 'active'
+                        })
+
+                        await newUser.save()
+                        console.log('Created new user from Google profile:', newUser._id)
+                        return done(null, newUser)
                     }
                     
-                    // Nếu không có tài khoản, tạo mới
-                    const newUser = new User({
-                        googleId: profile.id,
-                        email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null,
-                        name: profile.displayName,
-                        full_name: profile.displayName,
-                        first_name: profile.name?.givenName || '',
-                        status: 'active',
-                        // Thêm các thông tin khác từ profile nếu cần
-                    })
-                    
-                    await newUser.save()
-                    console.log('Created new user with Google ID:', newUser._id)
-                    return done(null, newUser)
+                    // Nếu không có email, trả về lỗi
+                    return done(new Error('No email provided by Google'), null)
                 } catch (error) {
                     console.error('Error in Google authentication strategy:', error)
                     return done(error, null)
@@ -129,6 +134,9 @@ function createApp() {
     routeAdmin(app)
     //route client
     routeClient(app)
+
+    // Google Auth router
+    app.use('/auth', googleAuthRouter)
 
     // API generate script
     app.use('/api/generate-script', generateScriptRouter)

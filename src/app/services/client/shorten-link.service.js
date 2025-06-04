@@ -4,7 +4,7 @@ import aqp from 'api-query-params'
 import { generateAlias } from '@/utils/generateAlias'
 import { APP_URL_CLIENT } from '@/configs'
 import ApiWebs from '@/models/client/api-webs'
-import QRCode from 'qrcode'
+// import QRCode from 'qrcode'
 
 
 export async function create(body, req) {
