@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: refslink-backend
+    ports:
+      - "3111:3111"
+    env_file:
+      - .env
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./uploads:/usr/src/app/uploads
+    restart: unless-stopped
