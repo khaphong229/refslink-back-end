@@ -1,5 +1,6 @@
 import * as ShortenToolService from '@/app/services/client/shorten-tool.service'
 import { pick } from 'lodash'
+import * as shortenLinkService from '@/app/services/client/shorten-link.service'
 
 export async function getOrCreateToken(req, res) {
     try {
@@ -37,6 +38,15 @@ export async function shortenUrl(req, res, type = null) {
     }
 }
 
+export async function shortenDevelopApi(req, res) {
+    const result = await shortenLinkService.create(req.data, req)
+
+    return res.json({
+        status: 'success',
+        shortenedUrl: result.shorten_link,
+    })
+}
+
 export async function shortenBulkUrls(req, res) {
     try {
         const urls = req.body.urls
@@ -48,9 +58,32 @@ export async function shortenBulkUrls(req, res) {
             })
         }
 
-        const results = await ShortenToolService.shortenBulkUrls(req, res, urls)
+        const existingUrls = req.existingUrls || []
 
-        res.status(201).jsonify(results)
+        const urlsToShorten = urls.filter((url, index) => !existingUrls[index]?.exists)
+
+        let results = []
+
+        if (urlsToShorten.length > 0) {
+            const newResults = await ShortenToolService.shortenBulkUrls(req, res, urlsToShorten)
+            results = newResults.map((result) => result)
+        }
+
+        existingUrls.forEach((item) => {
+            if (item.exists) {
+                results.push({
+                    message: 'success',
+                    data: item.data,
+                })
+            }
+        })
+
+        res.status(201).json({
+            status: 201,
+            success: true,
+            message: 'Created',
+            data: results,
+        })
     } catch (error) {
         res.status(500).jsonify(error)
     }

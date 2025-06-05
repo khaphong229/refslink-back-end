@@ -1,6 +1,7 @@
 import ShortenTool from '@/models/client/shorten-tool'
 import User from '@/models/client/user'
 import * as shortenLinkMiddleWare from '@/app/middleware/common/client/shorten-link.middleware'
+import { abort } from '@/utils/helpers'
 
 export async function validateGetTokenRequest(req, res, next) {
     const userId = req.currentUser?._id
@@ -67,4 +68,28 @@ export function validateBulkShortenRequest(req, res, next) {
         })
     }
     next()
+}
+
+export async function validateDevelopApi(req, res, next) {
+    const { api, url, alias } = req.query
+
+    if (!api || !url || !alias) {
+        abort(404, 'Vui lòng nhập đầy đủ tham số.')
+    }
+
+    const data = await ShortenTool.findOne({ token: api })
+    if (!data) {
+        abort(404, 'API không hợp lệ.')
+    }
+
+    const user = await User.findById(data.user_id)
+    if (!user) {
+        abort(404, 'Người dùng không tồn tại')
+    }
+
+    req.currentUser = user
+    req.data = { api, url, alias }
+    req.body.original_link = url
+
+    return await shortenLinkMiddleWare.checkShortenLink(req, res, next)
 }
