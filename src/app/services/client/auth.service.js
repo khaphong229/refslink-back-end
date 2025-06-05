@@ -4,6 +4,7 @@ import { User } from '@/models'
 import { cache, LOGIN_EXPIRE_IN, TOKEN_TYPE } from '@/configs'
 import { FileUpload } from '@/utils/classes'
 import { generateToken } from '@/utils/helpers'
+import Referral from '@/models/client/referral'
 
 export const tokenBlocklist = cache.create('token-block-list')
 
@@ -31,12 +32,19 @@ export function authToken(user) {
     }
 }
 
-export async function register({ avatar, ...requestBody }) {
+export async function register({ avatar,  ...requestBody }) {
     if (avatar instanceof FileUpload) {
         requestBody.avatar = avatar.save('avatar')
     }
 
     const user = new User(requestBody)
+    if (!user.ref_code) {
+        // user.ref_code = generateRefCode(user._id) // hoặc random string
+        // const savedUser = await user.save()
+    
+    }
+
+
     return await user.save()
 }
 

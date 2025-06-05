@@ -43,13 +43,12 @@ export async function verifyEmailToken(req, res) {
         const user = await User.findById(payload.data.user_id)
         if (!user) return res.status(404).jsonify('Không tìm thấy người dùng')
 
-        // Cập nhật trạng thái
         user.status = 'active'
-        
         await user.save()
 
         res.status(200).jsonify('Xác minh tài khoản thành công!')
     } catch (err) {
+        console.error('Verify email error:', err)
         res.status(400).jsonify('Token không hợp lệ hoặc đã hết hạn.')
     }
 }

@@ -55,6 +55,7 @@ assert(_.isArray(OTHER_URLS_CLIENT), 'OTHER_URLS_CLIENT must be an array.')
 export const SECRET_KEY = process.env.SECRET_KEY
 assert(!_.isEmpty(SECRET_KEY), assertMsg('SECRET_KEY'))
 
+
 export const LOGIN_EXPIRE_IN = process.env.LOGIN_EXPIRE_IN
 assert(!_.isEmpty(LOGIN_EXPIRE_IN), assertMsg('LOGIN_EXPIRE_IN'))
 
