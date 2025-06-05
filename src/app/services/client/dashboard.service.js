@@ -1,11 +1,11 @@
 import ShortenLink from '@/models/client/shorten-link'
 import { startOfMonth, endOfMonth, eachDayOfInterval, format } from 'date-fns'
+import { getCommissionSettings } from '../admin/commission.service'
 
 export async function getStatistics(req) {
     const user_id = req.currentUser._id
     let { month, year } = req.query
 
-    // Validate và chuyển đổi month, year
     month = parseInt(month)
     year = parseInt(year)
 
@@ -21,13 +21,11 @@ export async function getStatistics(req) {
         throw new Error('Năm phải nằm từ 2000 đến 2100')
     }
 
-    // Tạo date range cho tháng được chọn
     const startDate = startOfMonth(new Date(year, month - 1))
     const today = new Date()
     const endDate =
         today < endOfMonth(new Date(year, month - 1)) ? today : endOfMonth(new Date(year, month - 1))
 
-    // Tìm tất cả link của user trong tháng
     const links = await ShortenLink.find({
         user_id,
         created_at: {
@@ -36,10 +34,12 @@ export async function getStatistics(req) {
         },
     })
 
-    // Tính toán thống kê tổng
+    const { cpm, ref_percent } = await getCommissionSettings()
+    console.log(cpm, ref_percent)
+
     const totalViews = links.reduce((sum, link) => sum + (link.click_count || 0), 0)
     const totalValidViews = links.reduce((sum, link) => sum + (link.valid_clicks || 0), 0)
-    const ratePerView = 3 / 1000 // $3 per 1000 views
+    const ratePerView = cpm / 1000 // cpm per 1000 views
     const totalEarned = totalValidViews * ratePerView
 
     // Tạo dữ liệu cho biểu đồ (theo ngày)
@@ -80,7 +80,7 @@ export async function getStatistics(req) {
             const validViews = link.valid_clicks || 0
             const income = validViews * ratePerView
             const cpm = views > 0 ? (income / views) * 1000 : 0
-            const referralEarning = income * 0.1 // 10% referral
+            const referralEarning = income * ref_percent // referral
 
             dailyStats[dayStr].views += views
             dailyStats[dayStr].income += income
@@ -104,7 +104,7 @@ export async function getStatistics(req) {
         total_valid_views: totalValidViews,
         total_earned: parseFloat(totalEarned.toFixed(2)),
         rate: {
-            per_1000_views: 3,
+            per_1000_views: cpm,
             currency: 'USD',
         },
         period: {

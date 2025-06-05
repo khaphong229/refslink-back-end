@@ -1,9 +1,7 @@
 import { generateTokenAPI } from '@/utils/generateAlias'
 import ShortenTool from '@/models/client/shorten-tool'
-import ShortenLink from '@/models/client/shorten-link'
-import { pick } from 'lodash'
 import * as shortenLinkService from '@/app/services/client/shorten-link.service'
-import * as shortenLinkMiddleware from '@/app/middleware/common/client/shorten-link.middleware'
+import { pick } from 'lodash'
 
 export async function getOrCreateToken(userId) {
     let tool = await ShortenTool.findOne({ user_id: userId })
@@ -33,38 +31,17 @@ export async function shortenUrl(req) {
     return data
 }
 
-export async function shortenBulkUrls(req, token, urls) {
-    const tool = await ShortenTool.findOne({ token })
-
-    if (!tool) {
-        throw new Error('Invalid API token')
-    }
-
+export async function shortenBulkUrls(req, res, urls) {
     const results = []
     for (const url of urls) {
         try {
             req.body.original_link = url
-            if (await shortenLinkMiddleware.checkValidLink(url)) {
-                
-                let data = await ShortenLink.findOne({original_link : url, user_id : req.currentUser.id})
-                req.body.alias = null 
-                
-                if (!data) {
-                    data = await shortenLinkService.create(req.body, req)
-                }
-
-                const filteredData = pick(data, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at'])
-                results.push({
-                    message: 'success',
-                    data: filteredData,
-                })
-            } else {
-                results.push({
-                    message: 'error',
-                    original_link: url,
-                    error: 'Link vi phạm chính sách cộng đồng',
-                })
-            }
+            const data = await shortenLinkService.create(req.body, req)
+            const filteredData = pick(data, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at'])
+            results.push({
+                message: 'success',
+                data: filteredData,
+            })
         } catch (error) {
             results.push({
                 message: 'error',
