@@ -10,8 +10,8 @@ const infoFulledUser = {
     },
     status: {
         type: String,
-        required: true,
         default: 'inactive',
+        required:false
     },
     avatar: {
         type: String,
@@ -61,6 +61,10 @@ const infoFulledUser = {
         required: false,
         ref: 'User'
     },
+    country:{
+        type:String,
+        
+    }
 }
 
 const User = createModel('User', 'users', infoFulledUser, {
