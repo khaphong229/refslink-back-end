@@ -42,13 +42,21 @@ const infoFulledUser = {
         type: Number,
         default: 0,
     },
-    phone: {
-        type: String,
-        default: '',
+    being_paid: {
+        type: Number,
+        default: 0,
+    },
+    total_payment: {
+        type: Number,
+        default: 0,
     },
     total_earned: {
         type: Number,
         default: 0,
+    },
+    phone: {
+        type: String,
+        default: '',
     },
     method_withdraw: {
         type: String,
