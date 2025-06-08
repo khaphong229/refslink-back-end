@@ -6,6 +6,7 @@ const infoFulledUser = {
     ...infoGeneralUser,
     googleId: {
         type: String,
+        default: '',
     },
     status: {
         type: String,
@@ -14,22 +15,28 @@ const infoFulledUser = {
     },
     avatar: {
         type: String,
-        default: 'https://res.cloudinary.com/dqj0xgk8v/image/upload/v1695860982/avater/avater-default.png',
+        default:
+            'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.shareicon.net%2Fyoung-man-user-avatar-male-person-103160&psig=AOvVaw0dxsdcGK8woJqVq4BmKHES&ust=1749296985406000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCID3taDd3I0DFQAAAAAdAAAAABAL',
     },
     full_name: {
         type: String,
+        default: '',
     },
     first_name: {
         type: String,
+        default: '',
     },
     address: {
         type: String,
+        default: '',
     },
     birth_date: {
         type: Date,
+        default: null,
     },
     gender: {
         type: String,
+        default: 'other',
     },
     balance: {
         type: Number,
@@ -37,6 +44,7 @@ const infoFulledUser = {
     },
     phone: {
         type: String,
+        default: '',
     },
     total_earned: {
         type: Number,
@@ -48,16 +56,19 @@ const infoFulledUser = {
     },
     info_withdraw: {
         type: String,
+        default: '',
     },
     ref_code: {
         type: String,
         required: false,
         unique: true,
+        default: '',
     },
     ref_by: {
         type: ObjectId,
         required: false,
         ref: 'User',
+        default: null,
     },
 }
 

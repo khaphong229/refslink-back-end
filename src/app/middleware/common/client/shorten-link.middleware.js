@@ -249,7 +249,7 @@ export async function checkShortenLink(req, res, next, type = null) {
         }
 
         req.existingUrls = results
-        req.type = 'mutiple'
+        req.type = 'multiple'
         return next()
     }
 
