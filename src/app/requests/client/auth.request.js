@@ -57,20 +57,20 @@ export const updateProfile = Joi.object({
         .pattern(VALIDATE_FULL_NAME_REGEX)
         .label('Họ và tên')
         .messages({ 'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.' }),
-    email: Joi.string()
-        .trim()
-        .lowercase()
-        .email()
-        .required()
-        .max(MAX_STRING_SIZE)
-        .label('Email')
-        .custom(
-            (value, helpers) =>
-                new AsyncValidate(value, async function (req) {
-                    const user = await User.findOne({ email: value, _id: { $ne: req.currentUser._id } })
-                    return !user ? value : helpers.error('any.exists')
-                })
-        ),
+    // email: Joi.string()
+    //     .trim()
+    //     .lowercase()
+    //     .email()
+    //     .required()
+    //     .max(MAX_STRING_SIZE)
+    //     .label('Email')
+    //     .custom(
+    //         (value, helpers) =>
+    //             new AsyncValidate(value, async function (req) {
+    //                 const user = await User.findOne({ email: value, _id: { $ne: req.currentUser._id } })
+    //                 return !user ? value : helpers.error('any.exists')
+    //             })
+    //     ),
     phone: Joi.string()
         .trim()
         .pattern(VALIDATE_PHONE_REGEX)
@@ -83,13 +83,22 @@ export const updateProfile = Joi.object({
                     return !user ? value : helpers.error('any.exists')
                 })
         ),
-    avatar: Joi.object({
-        mimetype: Joi.valid('image/jpeg', 'image/png', 'image/svg+xml', 'image/webp').label('Định dạng ảnh'),
-    })
-        .unknown(true)
-        .instance(FileUpload)
+    // avatar: Joi.object({
+    //     mimetype: Joi.valid('image/jpeg', 'image/png', 'image/svg+xml', 'image/webp').label('Định dạng ảnh'),
+    // })
+    //     .unknown(true)
+    //     .instance(FileUpload)
+    //     .allow('')
+    //     .label('Ảnh đại diện'),
+    full_name: Joi.string()
+        .trim()
+        .min(3)
+        .max(MAX_STRING_SIZE)
+        .pattern(VALIDATE_FULL_NAME_REGEX)
         .allow('')
-        .label('Ảnh đại diện'),
+        .label('Họ và tên đầy đủ')
+        .messages({ 'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.' })
+    ,
     address: Joi.string().min(6).max(MAX_STRING_SIZE).allow('').label('Địa chỉ'),
     birth_date: Joi.date().iso().allow(null).label('Ngày sinh nhật'),
     gender: Joi.string().allow('').label('Giới tính'),

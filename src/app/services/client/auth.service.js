@@ -60,53 +60,31 @@ export async function profile(userId) {
     return user
 }
 
-export async function updateProfile(
-    currentUser,
-    {
-        name,
-        email,
-        phone,
-        full_name,
-        first_name,
-        avatar,
-        address,
-        birth_date,
-        gender,
-        balance,
-        total_earned,
-        method_withdraw,
-        info_withdraw,
-        ref_code,
-        ref_by,
-        status,
-    }
-) {
-    currentUser.name = name
-    currentUser.email = email
-    currentUser.phone = phone
-    currentUser.full_name = full_name
-    currentUser.first_name = first_name
-    currentUser.address = address
-    currentUser.birth_date = birth_date
-    currentUser.gender = gender
-    currentUser.balance = balance
-    currentUser.total_earned = total_earned
-    currentUser.method_withdraw = method_withdraw
-    currentUser.info_withdraw = info_withdraw
-    currentUser.ref_code = ref_code
-    currentUser.ref_by = ref_by
-    currentUser.status = status
+export async function updateProfile(currentUser, data) {
+    const updatableFields = [
+        'name', 'phone', 'full_name', 'first_name', 'address',
+        'birth_date', 'gender', 'balance', 'total_earned',
+        'method_withdraw', 'info_withdraw', 'ref_code', 'ref_by', 'status'
+    ]
 
-    if (avatar instanceof FileUpload) {
+    for (const field of updatableFields) {
+        if (Object.prototype.hasOwnProperty.call(data, field)) {
+            currentUser[field] = data[field]
+        }
+    }
+
+    if (data.avatar instanceof FileUpload) {
         if (currentUser.avatar) {
             FileUpload.remove(currentUser.avatar)
         }
-        avatar = avatar.save('images')
-        currentUser.avatar = avatar
+        const savedAvatar = data.avatar.save('images')
+        currentUser.avatar = savedAvatar
     }
 
     await currentUser.save()
 }
+
+
 
 export async function linkEmail(user, newEmail) {
     const existingUser = await User.findOne({ email: newEmail })

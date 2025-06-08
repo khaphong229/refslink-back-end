@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import createModel, { ObjectId } from '../base'
 import { infoGeneralUser } from '../admin/admin'
 import { required } from 'joi'
+import { de } from 'date-fns/locale'
 
 const infoFulledUser = {
     ...infoGeneralUser,
@@ -19,12 +20,14 @@ const infoFulledUser = {
     },
     full_name: {
         type: String,
+        default: '',
     },
     first_name: {
         type: String,
     },
     address: {
         type: String,
+        default: '',
     },
     birth_date: {
         type: Date,
@@ -38,6 +41,7 @@ const infoFulledUser = {
     },
     phone: {
         type: String,
+        default: '',
     },
     total_earned: {
         type: Number,
@@ -49,6 +53,7 @@ const infoFulledUser = {
     },
     info_withdraw: {
         type: String,
+        default: '',
     },
     ref_code: {
         type: String,
@@ -63,7 +68,7 @@ const infoFulledUser = {
     },
     country:{
         type:String,
-        
+        default: 'VN',
     }
 }
 
