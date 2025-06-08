@@ -1,6 +1,5 @@
 import { pick } from 'lodash'
 import * as shortenLinkService from '@/app/services/client/shorten-link.service'
-// import { getOrCreateShortenLinkQRCode } from '@/app/services/client/shorten-link.service'
 
 export async function create(req, res) {
     const data = await shortenLinkService.create(req.body, req)
@@ -44,8 +43,11 @@ export async function deleteByID(req, res) {
 }
 
 export async function goLink(req, res) {
-    const data = await shortenLinkService.goLink(req.body, req)
-    res.status(201).jsonify(data)
+    const { alias } = req.body;
+    const user_id = req.currentUser?._id;
+    const { ip, country, device, browser, referer } = req.clickInfo || {};
+    const data = await shortenLinkService.goLink({ alias, user_id, ip, country, device, browser, referer });
+    res.status(201).jsonify(data);
 }
 
 export async function goLinkValid(req, res) {

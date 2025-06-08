@@ -5,6 +5,7 @@ import { Router } from 'express'
 import * as shortenLinkRequest from '@/app/requests/client/shorten-link.request'
 import * as shortenLinkController from '@/app/controllers/client/shorten-link.controller'
 import * as shortenLinkMiddleWare from '@/app/middleware/common/client/shorten-link.middleware'
+import extractClickInfo from '@/app/middleware/common/client/extract-click-info.middleware'
 
 const shortenLinkRouter = Router()
 
@@ -40,7 +41,7 @@ shortenLinkRouter.delete(
     asyncHandler(shortenLinkController.deleteByID)
 )
 
-shortenLinkRouter.post('/go', asyncHandler(shortenLinkController.goLink))
+shortenLinkRouter.post('/go', extractClickInfo, asyncHandler(shortenLinkController.goLink))
 
 shortenLinkRouter.post('/go/link', asyncHandler(shortenLinkController.goLinkValid))
 

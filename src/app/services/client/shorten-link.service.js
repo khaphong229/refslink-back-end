@@ -4,6 +4,7 @@ import aqp from 'api-query-params'
 import { generateAlias } from '@/utils/generateAlias'
 import { APP_URL_CLIENT } from '@/configs'
 import ApiWebs from '@/models/client/api-webs'
+import ClickLog from '@/models/client/click-log'
 // import QRCode from 'qrcode'
 
 const geoip = require('geoip-lite')
@@ -115,21 +116,33 @@ export async function deleteByID(id, req) {
     return data
 }
 
-export async function goLink(body) {
-    const alias = body.alias
+// ...existing code...
+
+export async function goLink({ alias, user_id, ip, country, device, browser, referer }) {
     const dataLink = await ShortenLink.findOne({ alias: alias })
     if (!dataLink) return null
 
+    await ClickLog.create({
+        link_id: dataLink._id,
+        user_id: user_id || dataLink.user_id || null,
+        ip,
+        country,
+        device,
+        browser,
+        referer,
+        is_valid: true,
+        earned_amount: 0,
+        created_at: new Date()
+    })
+
     if (dataLink.api_web_id) {
         const apiWeb = await ApiWebs.findById(dataLink.api_web_id).select('name_api description').lean()
-
         return {
             link: dataLink.third_party_link,
             name: apiWeb.name_api,
             description: apiWeb.description,
         }
     }
-
     return {
         link: dataLink.original_link,
         name: '',
