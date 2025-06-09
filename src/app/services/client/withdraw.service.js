@@ -3,6 +3,17 @@ import User from '@/models/client/user'
 import { formatDecimal } from '@/utils/formatDecimal'
 import { generateWithdrawCode } from '@/utils/generateAlias'
 
+function parseToDate(to) {
+    if (!to) return null
+    const toDate = new Date(to)
+    // Nếu chỉ truyền yyyy-mm-dd thì lấy hết ngày đó
+    if (typeof to === 'string' && to.length === 10) {
+        toDate.setDate(toDate.getDate() + 1)
+        toDate.setMilliseconds(toDate.getMilliseconds() - 1)
+    }
+    return toDate
+}
+
 export async function createWithdrawRequest({
     userId,
     amount_money,
@@ -31,12 +42,52 @@ export async function createWithdrawRequest({
     return withdraw
 }
 
-export async function getAllWithdrawRequestsByUser(userId) {
-    return await Withdraw.find({ user_id: userId }).sort({ created_at: -1 })
+export async function getAllWithdrawRequestsByUser(userId, { page = 1, limit = 10, status, sort = 'desc', from, to } = {}) {
+    const query = { user_id: userId }
+    if (status) query.status = status
+    if (from || to) {
+        query.created_at = {}
+        if (from) query.created_at.$gte = new Date(from)
+        if (to) query.created_at.$lte = parseToDate(to)
+    }
+    const sortOption = { created_at: sort === 'asc' ? 1 : -1, status: 1 }
+    const skip = (Number(page) - 1) * Number(limit)
+    const withdraws = await Withdraw.find(query)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(Number(limit))
+    const total = await Withdraw.countDocuments(query)
+    return {
+        data: withdraws,
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+    }
 }
 
-export async function getAllWithdrawRequests() {
-    return await Withdraw.find({}).sort({ created_at: -1 })
+export async function getAllWithdrawRequests({ page = 1, limit = 10, status, sort = 'desc', from, to } = {}) {
+    const query = {}
+    if (status) query.status = status
+    if (from || to) {
+        query.created_at = {}
+        if (from) query.created_at.$gte = new Date(from)
+        if (to) query.created_at.$lte = parseToDate(to)
+    }
+    const sortOption = { created_at: sort === 'asc' ? 1 : -1, status: 1 }
+    const skip = (Number(page) - 1) * Number(limit)
+    const withdraws = await Withdraw.find(query)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(Number(limit))
+    const total = await Withdraw.countDocuments(query)
+    return {
+        data: withdraws,
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+    }
 }
 
 export async function updateWithdrawStatus(id, status, note) {
