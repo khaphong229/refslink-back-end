@@ -7,6 +7,9 @@ import * as authController from '../../app/controllers/client/auth.controller'
 import { asyncHandler } from '@/utils/helpers'
 import passport from 'passport'
 import * as authService from '../../app/services/client/auth.service'
+import { redirect } from 'statuses'
+import { APP_URL_CLIENT } from '@/configs'
+
 
 const authRouter = Router()
 
@@ -24,7 +27,7 @@ authRouter.post(
     asyncHandler(authController.verifyEmailToken)
 )
 
-authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], prompt: 'select_account' }))
 
 authRouter.get(
     '/google/callback',
@@ -33,50 +36,19 @@ authRouter.get(
         failureRedirect: '/auth/login?error=google_auth_failed',
     }),
     (req, res) => {
-        console.log('Print REQ')
-        console.log(req.user)
-        console.log('Print RES')
-        // console.log(res)   
         try {
             if (!req.user) {
-                console.error('No user found in request after Google authentication')
-                return res.status(400).json({  // sửa jsonify thành json
-                    status: 400,
-                    success: false,
-                    message: 'Không tìm thấy thông tin người dùng sau khi xác thực Google',
-                    data: null,
-                })
+                return redirect(`${APP_URL_CLIENT}/login/?error=user_not_found`)
             }
 
             const result = authService.authToken(req.user)
 
-            console.log('Authentication successful. Returning token...')
-            console.log(result)
+            const redirectUrl = `${APP_URL_CLIENT}/user/login/success?token=${result.access_token}`
 
-            res.status(200).json({   // sửa jsonify thành json
-                status: 200,
-                success: true,
-                message: 'Login successful',
-                data: {
-                    access_token: result.access_token,
-                    expires_in: result.expire_in,
-                    token_type: 'Bearer',
-                    user: {
-                        id: req.user._id,
-                        name: req.user.name || req.user.full_name || '',
-                        email: req.user.email || '',
-                        avatar: req.user.avatar || '',
-                    },
-                },
-            })
+            return res.redirect(redirectUrl)
         } catch (error) {
             console.error('Error in Google callback:', error)
-            res.status(500).json({   // sửa jsonify thành json
-                status: 500,
-                success: false,
-                message: 'Đã xảy ra lỗi khi xử lý đăng nhập Google',
-                data: null,
-            })
+            return res.redirect(`${APP_URL_CLIENT}/login/?error=server_failed`)
         }
     }
 )
