@@ -61,7 +61,7 @@ export async function updateWithdrawStatus(id, status, note) {
     if (status === 'completed' && oldStatus !== 'completed') {
         const user = await User.findById({ _id: withdraw.user_id })
         if (user) {
-            user.being_paid = formatDecimal(user.being_paid - withdraw.amount_money)
+            user.being_paid = 0
             user.total_payment = formatDecimal((user.total_payment || 0) + withdraw.amount_money)
             await user.save()
         }
