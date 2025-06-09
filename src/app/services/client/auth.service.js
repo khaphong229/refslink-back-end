@@ -4,7 +4,10 @@ import { User } from '@/models'
 import { cache, LOGIN_EXPIRE_IN, TOKEN_TYPE } from '@/configs'
 import { FileUpload } from '@/utils/classes'
 import { generateToken } from '@/utils/helpers'
-import Referral from '@/models/client/referral'
+import { generateRefCode } from '@/utils/generateCode'
+import { handleUserLogin, handleUserRegistration } from './referral.service'
+import { updateUserBalance } from './balance.service'
+import { updateAllUserLinksEarnings } from './shorten-link-earning.service'
 
 export const tokenBlocklist = cache.create('token-block-list')
 
@@ -14,6 +17,9 @@ export async function checkValidLogin({ email, password }) {
     if (user) {
         const verified = user.verifyPassword(password)
         if (verified) {
+            await handleUserLogin(user._id)
+            await updateAllUserLinksEarnings(user._id)
+            await updateUserBalance(user._id)
             return [true, user]
         }
     }
@@ -32,20 +38,32 @@ export function authToken(user) {
     }
 }
 
-export async function register({ avatar,  ...requestBody }) {
+export async function register({ avatar, ...requestBody }) {
+    console.log(requestBody)
+
     if (avatar instanceof FileUpload) {
         requestBody.avatar = avatar.save('avatar')
     }
 
     const user = new User(requestBody)
-    if (!user.ref_code) {
-        // user.ref_code = generateRefCode(user._id) // hoặc random string
-        // const savedUser = await user.save()
-    
+
+    if (requestBody.ref) {
+        const userRef = await User.findOne({ ref_code: requestBody.ref })
+        if (userRef) {
+            user.ref_by = userRef._id
+        }
     }
 
+    await user.save()
 
-    return await user.save()
+    if (!user.ref_code) {
+        user.ref_code = generateRefCode(user._id)
+        await user.save()
+    }
+
+    await handleUserRegistration(user._id)
+
+    return user
 }
 
 export async function blockToken(token) {
@@ -60,53 +78,31 @@ export async function profile(userId) {
     return user
 }
 
-export async function updateProfile(
-    currentUser,
-    {
-        name,
-        email,
-        phone,
-        full_name,
-        first_name,
-        avatar,
-        address,
-        birth_date,
-        gender,
-        balance,
-        total_earned,
-        method_withdraw,
-        info_withdraw,
-        ref_code,
-        ref_by,
-        status,
-    }
-) {
-    currentUser.name = name
-    currentUser.email = email
-    currentUser.phone = phone
-    currentUser.full_name = full_name
-    currentUser.first_name = first_name
-    currentUser.address = address
-    currentUser.birth_date = birth_date
-    currentUser.gender = gender
-    currentUser.balance = balance
-    currentUser.total_earned = total_earned
-    currentUser.method_withdraw = method_withdraw
-    currentUser.info_withdraw = info_withdraw
-    currentUser.ref_code = ref_code
-    currentUser.ref_by = ref_by
-    currentUser.status = status
+export async function updateProfile(currentUser, data) {
+    const updatableFields = [
+        'phone', 'full_name', 'first_name', 'address',
+        'birth_date', 'gender', 'balance', 'total_earned',
+        'method_withdraw', 'info_withdraw', 'ref_code', 'ref_by', 'status','country'
+    ]
 
-    if (avatar instanceof FileUpload) {
+    for (const field of updatableFields) {
+        if (Object.prototype.hasOwnProperty.call(data, field)) {
+            currentUser[field] = data[field]
+        }
+    }
+
+    if (data.avatar instanceof FileUpload) {
         if (currentUser.avatar) {
             FileUpload.remove(currentUser.avatar)
         }
-        avatar = avatar.save('images')
-        currentUser.avatar = avatar
+        const savedAvatar = data.avatar.save('images')
+        currentUser.avatar = savedAvatar
     }
 
     await currentUser.save()
 }
+
+
 
 export async function linkEmail(user, newEmail) {
     const existingUser = await User.findOne({ email: newEmail })

@@ -26,8 +26,16 @@ router.get(
 router.post(
     '/st/bulk',
     asyncHandler(requireAuthentication),
+    (req, res, next) => shortenLinkMiddleWare.checkShortenLink(req, res, next, 'multiple'),
     asyncHandler(shortenLinkMiddleWare.getApiWebActive),
     asyncHandler(shortenToolController.shortenBulkUrls)
+)
+
+router.get(
+    '/api',
+    asyncHandler(shortenToolMiddleware.validateDevelopApi),
+    asyncHandler(shortenLinkMiddleWare.getApiWebActive),
+    asyncHandler(shortenToolController.shortenDevelopApi)
 )
 
 export default router

@@ -4,9 +4,10 @@ import {
     MAX_STRING_SIZE,
     VALIDATE_FULL_NAME_REGEX,
     VALIDATE_PASSWORD_REGEX,
-    VALIDATE_PHONE_REGEX, 
+    VALIDATE_PHONE_REGEX,
 } from '@/configs'
 import { AsyncValidate, FileUpload } from '@/utils/classes'
+import { method } from 'lodash'
 
 export const login = Joi.object({
     email: Joi.string().trim().max(MAX_STRING_SIZE).lowercase().email().required().label('Email'),
@@ -47,30 +48,30 @@ export const register = Joi.object({
             'string.pattern.base':
                 '{{#label}} phải có ít nhất một chữ thường, chữ hoa, số và ký tự đặc biệt.',
         }),
+    ref: Joi.string().trim().allow('', null).optional().label('Mã giới thiệu'),
 })
 
 export const updateProfile = Joi.object({
     name: Joi.string()
         .trim()
-        .required()
         .max(MAX_STRING_SIZE)
         .pattern(VALIDATE_FULL_NAME_REGEX)
         .label('Họ và tên')
         .messages({ 'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.' }),
-    email: Joi.string()
-        .trim()
-        .lowercase()
-        .email()
-        .required()
-        .max(MAX_STRING_SIZE)
-        .label('Email')
-        .custom(
-            (value, helpers) =>
-                new AsyncValidate(value, async function (req) {
-                    const user = await User.findOne({ email: value, _id: { $ne: req.currentUser._id } })
-                    return !user ? value : helpers.error('any.exists')
-                })
-        ),
+    // email: Joi.string()
+    //     .trim()
+    //     .lowercase()
+    //     .email()
+    //     .required()
+    //     .max(MAX_STRING_SIZE)
+    //     .label('Email')
+    //     .custom(
+    //         (value, helpers) =>
+    //             new AsyncValidate(value, async function (req) {
+    //                 const user = await User.findOne({ email: value, _id: { $ne: req.currentUser._id } })
+    //                 return !user ? value : helpers.error('any.exists')
+    //             })
+    //     ),
     phone: Joi.string()
         .trim()
         .pattern(VALIDATE_PHONE_REGEX)
@@ -83,13 +84,22 @@ export const updateProfile = Joi.object({
                     return !user ? value : helpers.error('any.exists')
                 })
         ),
-    avatar: Joi.object({
-        mimetype: Joi.valid('image/jpeg', 'image/png', 'image/svg+xml', 'image/webp').label('Định dạng ảnh'),
-    })
-        .unknown(true)
-        .instance(FileUpload)
+    // avatar: Joi.object({
+    //     mimetype: Joi.valid('image/jpeg', 'image/png', 'image/svg+xml', 'image/webp').label('Định dạng ảnh'),
+    // })
+    //     .unknown(true)
+    //     .instance(FileUpload)
+    //     .allow('')
+    //     .label('Ảnh đại diện'),
+    full_name: Joi.string()
+        .trim()
+        .min(3)
+        .max(MAX_STRING_SIZE)
+        // .pattern(VALIDATE_FULL_NAME_REGEX)
         .allow('')
-        .label('Ảnh đại diện'),
+        .label('Họ và tên đầy đủ')
+        .messages({ 'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.' })
+    ,
     address: Joi.string().min(6).max(MAX_STRING_SIZE).allow('').label('Địa chỉ'),
     birth_date: Joi.date().iso().allow(null).label('Ngày sinh nhật'),
     gender: Joi.string().allow('').label('Giới tính'),
@@ -97,6 +107,17 @@ export const updateProfile = Joi.object({
     social_media: Joi.array().items(Joi.string()).allow('').label('Danh sách liên kết mạng xã hội'),
     successful_exchanges: Joi.number().label('Số lần trao đổi thành công'),
     last_login: Joi.date().iso().allow(null).label('Lần đăng nhập cuối cùng'),
+    method_withdraw: Joi.string()
+        .valid('bank', 'paypal', 'momo','payeer') 
+        .allow('')
+        .label('Phương thức rút tiền'),
+    info_withdraw: Joi.string().max(MAX_STRING_SIZE).allow('').label('Thông tin rút tiền'),
+    country: Joi.string()
+        .trim()
+        .max(MAX_STRING_SIZE)
+        .allow('')
+        .label('Quốc gia')
+        .messages({ 'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.' }),
 })
 
 export const changePassword = Joi.object({
