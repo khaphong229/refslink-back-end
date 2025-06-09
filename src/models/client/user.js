@@ -11,7 +11,7 @@ const infoFulledUser = {
     status: {
         type: String,
         default: 'inactive',
-        required:false
+        required: false,
     },
     avatar: {
         type: String,
@@ -45,46 +45,47 @@ const infoFulledUser = {
     phone: {
         type: String,
         default: '',
-    being_paid: {
-        type: Number,
-        default: 0,
+        being_paid: {
+            type: Number,
+            default: 0,
+        },
+        total_payment: {
+            type: Number,
+            default: 0,
+        },
+        total_earned: {
+            type: Number,
+            default: 0,
+        },
+        phone: {
+            type: String,
+            default: '',
+        },
+        method_withdraw: {
+            type: String,
+            default: 'bank',
+        },
+        info_withdraw: {
+            type: String,
+            default: '',
+        },
+        ref_code: {
+            type: String,
+            required: false,
+            unique: true,
+            default: '',
+        },
+        ref_by: {
+            type: ObjectId,
+            required: false,
+            ref: 'User',
+            default: null,
+        },
+        country: {
+            type: String,
+            default: 'VN',
+        },
     },
-    total_payment: {
-        type: Number,
-        default: 0,
-    },
-    total_earned: {
-        type: Number,
-        default: 0,
-    },
-    phone: {
-        type: String,
-        default: '',
-    },
-    method_withdraw: {
-        type: String,
-        default: 'bank',
-    },
-    info_withdraw: {
-        type: String,
-        default: '',
-    },
-    ref_code: {
-        type: String,
-        required: false,
-        unique: true,
-        default: '',
-    },
-    ref_by: {
-        type: ObjectId,
-        required: false,
-        ref: 'User',
-        default: null,
-    },
-    country:{
-        type:String,
-        default: 'VN',
-    }
 }
 
 const User = createModel('User', 'users', infoFulledUser, {
