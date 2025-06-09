@@ -18,8 +18,6 @@ export async function checkValidLogin({ email, password }) {
         const verified = user.verifyPassword(password)
         if (verified) {
             await handleUserLogin(user._id)
-            await updateAllUserLinksEarnings(user._id)
-            await updateUserBalance(user._id)
             return [true, user]
         }
     }
@@ -39,8 +37,6 @@ export function authToken(user) {
 }
 
 export async function register({ avatar, ...requestBody }) {
-    console.log(requestBody)
-
     if (avatar instanceof FileUpload) {
         requestBody.avatar = avatar.save('avatar')
     }
@@ -80,9 +76,20 @@ export async function profile(userId) {
 
 export async function updateProfile(currentUser, data) {
     const updatableFields = [
-        'phone', 'full_name', 'first_name', 'address',
-        'birth_date', 'gender', 'balance', 'total_earned',
-        'method_withdraw', 'info_withdraw', 'ref_code', 'ref_by', 'status','country'
+        'phone',
+        'full_name',
+        'first_name',
+        'address',
+        'birth_date',
+        'gender',
+        'balance',
+        'total_earned',
+        'method_withdraw',
+        'info_withdraw',
+        'ref_code',
+        'ref_by',
+        'status',
+        'country',
     ]
 
     for (const field of updatableFields) {
@@ -101,8 +108,6 @@ export async function updateProfile(currentUser, data) {
 
     await currentUser.save()
 }
-
-
 
 export async function linkEmail(user, newEmail) {
     const existingUser = await User.findOne({ email: newEmail })
