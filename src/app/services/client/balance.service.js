@@ -26,10 +26,20 @@ export async function updateUserBalance(userId) {
         const referralEarnings = await calculateReferralEarnings(userId)
         const shortenLinkEarnings = await calculateShortenLinkEarnings(userId)
 
-        const newTotalEarned = formatDecimal(referralEarnings + shortenLinkEarnings)
-        const newBalance = formatDecimal(newTotalEarned - user.total_payment - user.being_paid)
+        // Ensure all values are valid numbers
+        const totalEarned = formatDecimal(referralEarnings + shortenLinkEarnings)
+        const totalPayment = formatDecimal(user.total_payment || 0)
+        const beingPaid = formatDecimal(user.being_paid || 0)
 
-        user.total_earned = newTotalEarned
+        // Calculate balance with proper validation
+        const newBalance = formatDecimal(totalEarned - totalPayment - beingPaid)
+
+        // Validate the calculated values
+        if (isNaN(newBalance) || isNaN(totalEarned)) {
+            throw new Error('Invalid balance calculation')
+        }
+
+        user.total_earned = totalEarned
         user.balance = newBalance
 
         await user.save()
@@ -37,8 +47,8 @@ export async function updateUserBalance(userId) {
         return {
             balance: formatDecimal(user.balance),
             total_earned: formatDecimal(user.total_earned),
-            being_paid: formatDecimal(user.being_paid),
-            total_payment: formatDecimal(user.total_payment),
+            being_paid: formatDecimal(user.being_paid || 0),
+            total_payment: formatDecimal(user.total_payment || 0),
         }
     } catch (error) {
         console.error('Lỗi khi cập nhật số dư:', error)
