@@ -31,3 +31,14 @@ export async function getAllWithdrawRequests(req, res) {
         abort(400, error.message)
     }
 }
+
+export async function updateWithdrawStatus(req, res) {
+    try {
+        const { id } = req.params
+        const { status, note } = req.body
+        const updated = await withdrawService.updateWithdrawStatus(id, status, note)
+        res.status(200).json(updated)
+    } catch (error) {
+        abort(400, error.message)
+    }
+}
