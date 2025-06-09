@@ -5,6 +5,9 @@ import { generateAlias } from '@/utils/generateAlias'
 import { APP_URL_CLIENT } from '@/configs'
 import ApiWebs from '@/models/client/api-webs'
 import ClickLog from '@/models/client/click-log'
+import { updateLinkEarnings } from './shorten-link-earning.service'
+import { getCommissionSettings } from '../admin/commission.service'
+import clickLog from '@/models/client/click-log'
 // import QRCode from 'qrcode'
 
 const geoip = require('geoip-lite')
@@ -40,7 +43,6 @@ export async function getAll(queryParams, req) {
     const searchConditions = { user_id }
     const limit = queryFilter?.limit || 10
     const page = queryFilter?.page || 1
-
 
     if (queryFilter?.status) {
         searchConditions.status = queryFilter.status
@@ -116,8 +118,6 @@ export async function deleteByID(id, req) {
     return data
 }
 
-// ...existing code...
-
 export async function goLink({ alias, user_id, ip, country, device, browser, referer }) {
     const dataLink = await ShortenLink.findOne({ alias: alias })
     if (!dataLink) return null
@@ -130,9 +130,8 @@ export async function goLink({ alias, user_id, ip, country, device, browser, ref
         device,
         browser,
         referer,
-        is_valid: true,
-        earned_amount: 0,
-        created_at: new Date()
+        is_valid: false,
+        created_at: new Date(),
     })
 
     if (dataLink.api_web_id) {
@@ -151,7 +150,6 @@ export async function goLink({ alias, user_id, ip, country, device, browser, ref
 
 export async function goLinkValid(body, req) {
     const alias = body.alias
-    console.log(alias)
     if (!alias) return { success: false, message: 'Alias is required' }
 
     const dataLink = await ShortenLink.findOne({ alias: alias })
@@ -159,13 +157,9 @@ export async function goLinkValid(body, req) {
 
     let userCountry = req.headers['x-country-code'] || null
 
-
     const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.connection.remoteAddress
-    console.log('IP Address:', ip)
     const geo = geoip.lookup(ip)
     userCountry = geo ? geo.country : null
-    
-    console.log('User Country:', userCountry)
 
     let apiWeb = null
     if (dataLink.api_web_id) {
@@ -178,36 +172,61 @@ export async function goLinkValid(body, req) {
         }
     }
 
-
     await ShortenLink.findByIdAndUpdate(dataLink._id, {
         $set: {
             click_count: (dataLink.click_count || 0) + 1,
             valid_clicks: (dataLink.valid_clicks || 0) + 1,
         },
-        $inc: { current_view: 1 }
+        $inc: { current_view: 1 },
     })
 
+    const { cpm } = await getCommissionSettings()
+    const earnedAmount = cpm / 1000
+
+    await ClickLog.updateOne(
+        {
+            link_id: dataLink._id,
+            ip: ip,
+            is_valid: false,
+        },
+        {
+            $set: {
+                is_valid: true,
+                earned_amount: earnedAmount,
+            },
+        }
+    )
+
+    await updateLinkEarnings(dataLink._id)
 
     if (apiWeb) {
-      
         await ApiWebs.findByIdAndUpdate(dataLink.api_web_id, { $inc: { current_view: 1 } })
         const apiWebLatest = await ApiWebs.findById(dataLink.api_web_id)
 
-        if (!dataLink.api_used_list || !dataLink.api_used_list.some(id => id.equals(apiWeb._id))) {
+        if (!dataLink.api_used_list || !dataLink.api_used_list.some((id) => id.equals(apiWeb._id))) {
             await ShortenLink.findByIdAndUpdate(dataLink._id, {
-                $addToSet: { api_used_list: apiWeb._id }
+                $addToSet: { api_used_list: apiWeb._id },
             })
         }
-        if (typeof apiWebLatest.max_view === 'number' && typeof apiWebLatest.current_view === 'number' && apiWebLatest.current_view > apiWebLatest.max_view) {
- 
+        if (
+            typeof apiWebLatest.max_view === 'number' &&
+            typeof apiWebLatest.current_view === 'number' &&
+            apiWebLatest.current_view > apiWebLatest.max_view
+        ) {
             const user_id = dataLink.user_id
             const now = new Date()
 
             let apiList = await ApiWebs.find({ user_id, status: 'active' })
-            apiList = apiList.filter(api => {
+            apiList = apiList.filter((api) => {
                 if (api._id.equals(apiWeb._id)) return false
-                if (dataLink.api_used_list && dataLink.api_used_list.some(id => id.equals(api._id))) return false
-                if (typeof api.max_view === 'number' && typeof api.current_view === 'number' && api.current_view >= api.max_view) return false
+                if (dataLink.api_used_list && dataLink.api_used_list.some((id) => id.equals(api._id)))
+                    return false
+                if (
+                    typeof api.max_view === 'number' &&
+                    typeof api.current_view === 'number' &&
+                    api.current_view >= api.max_view
+                )
+                    return false
                 if (api.timer && api.timer_start && api.timer_end) {
                     if (!(now >= api.timer_start && now <= api.timer_end)) return false
                 }
@@ -219,11 +238,13 @@ export async function goLinkValid(body, req) {
             if (apiList.length > 0) {
                 apiList = apiList.sort((a, b) => a.priority - b.priority)
                 const newApi = apiList[0]
-                const newThirdPartyLink = dataLink.original_link ? await shortenLink(newApi.api_url, dataLink.original_link) : ''
+                const newThirdPartyLink = dataLink.original_link
+                    ? await shortenLink(newApi.api_url, dataLink.original_link)
+                    : ''
                 await ShortenLink.findByIdAndUpdate(dataLink._id, {
                     api_web_id: newApi._id,
                     third_party_link: newThirdPartyLink,
-                    $addToSet: { api_used_list: newApi._id }
+                    $addToSet: { api_used_list: newApi._id },
                 })
                 await ApiWebs.findByIdAndUpdate(newApi._id, { $inc: { current_view: 1 } })
                 return {

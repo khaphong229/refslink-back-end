@@ -4,7 +4,10 @@ import { User } from '@/models'
 import { cache, LOGIN_EXPIRE_IN, TOKEN_TYPE } from '@/configs'
 import { FileUpload } from '@/utils/classes'
 import { generateToken } from '@/utils/helpers'
-import Referral from '@/models/client/referral'
+import { generateRefCode } from '@/utils/generateCode'
+import { handleUserLogin, handleUserRegistration } from './referral.service'
+import { updateUserBalance } from './balance.service'
+import { updateAllUserLinksEarnings } from './shorten-link-earning.service'
 
 export const tokenBlocklist = cache.create('token-block-list')
 
@@ -14,6 +17,9 @@ export async function checkValidLogin({ email, password }) {
     if (user) {
         const verified = user.verifyPassword(password)
         if (verified) {
+            await handleUserLogin(user._id)
+            await updateAllUserLinksEarnings(user._id)
+            await updateUserBalance(user._id)
             return [true, user]
         }
     }
@@ -32,20 +38,32 @@ export function authToken(user) {
     }
 }
 
-export async function register({ avatar,  ...requestBody }) {
+export async function register({ avatar, ...requestBody }) {
+    console.log(requestBody)
+
     if (avatar instanceof FileUpload) {
         requestBody.avatar = avatar.save('avatar')
     }
 
     const user = new User(requestBody)
-    if (!user.ref_code) {
-        // user.ref_code = generateRefCode(user._id) // hoặc random string
-        // const savedUser = await user.save()
-    
+
+    if (requestBody.ref) {
+        const userRef = await User.findOne({ ref_code: requestBody.ref })
+        if (userRef) {
+            user.ref_by = userRef._id
+        }
     }
 
+    await user.save()
 
-    return await user.save()
+    if (!user.ref_code) {
+        user.ref_code = generateRefCode(user._id)
+        await user.save()
+    }
+
+    await handleUserRegistration(user._id)
+
+    return user
 }
 
 export async function blockToken(token) {

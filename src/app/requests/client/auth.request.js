@@ -4,7 +4,7 @@ import {
     MAX_STRING_SIZE,
     VALIDATE_FULL_NAME_REGEX,
     VALIDATE_PASSWORD_REGEX,
-    VALIDATE_PHONE_REGEX, 
+    VALIDATE_PHONE_REGEX,
 } from '@/configs'
 import { AsyncValidate, FileUpload } from '@/utils/classes'
 import { method } from 'lodash'
@@ -48,6 +48,7 @@ export const register = Joi.object({
             'string.pattern.base':
                 '{{#label}} phải có ít nhất một chữ thường, chữ hoa, số và ký tự đặc biệt.',
         }),
+    ref: Joi.string().trim().allow('', null).optional().label('Mã giới thiệu'),
 })
 
 export const updateProfile = Joi.object({
