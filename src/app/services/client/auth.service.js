@@ -62,9 +62,9 @@ export async function profile(userId) {
 
 export async function updateProfile(currentUser, data) {
     const updatableFields = [
-        'name', 'phone', 'full_name', 'first_name', 'address',
+        'phone', 'full_name', 'first_name', 'address',
         'birth_date', 'gender', 'balance', 'total_earned',
-        'method_withdraw', 'info_withdraw', 'ref_code', 'ref_by', 'status'
+        'method_withdraw', 'info_withdraw', 'ref_code', 'ref_by', 'status','country'
     ]
 
     for (const field of updatableFields) {

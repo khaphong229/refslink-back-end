@@ -7,6 +7,7 @@ import {
     VALIDATE_PHONE_REGEX, 
 } from '@/configs'
 import { AsyncValidate, FileUpload } from '@/utils/classes'
+import { method } from 'lodash'
 
 export const login = Joi.object({
     email: Joi.string().trim().max(MAX_STRING_SIZE).lowercase().email().required().label('Email'),
@@ -52,7 +53,6 @@ export const register = Joi.object({
 export const updateProfile = Joi.object({
     name: Joi.string()
         .trim()
-        .required()
         .max(MAX_STRING_SIZE)
         .pattern(VALIDATE_FULL_NAME_REGEX)
         .label('Họ và tên')
@@ -94,7 +94,7 @@ export const updateProfile = Joi.object({
         .trim()
         .min(3)
         .max(MAX_STRING_SIZE)
-        .pattern(VALIDATE_FULL_NAME_REGEX)
+        // .pattern(VALIDATE_FULL_NAME_REGEX)
         .allow('')
         .label('Họ và tên đầy đủ')
         .messages({ 'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.' })
@@ -106,6 +106,17 @@ export const updateProfile = Joi.object({
     social_media: Joi.array().items(Joi.string()).allow('').label('Danh sách liên kết mạng xã hội'),
     successful_exchanges: Joi.number().label('Số lần trao đổi thành công'),
     last_login: Joi.date().iso().allow(null).label('Lần đăng nhập cuối cùng'),
+    method_withdraw: Joi.string()
+        .valid('bank', 'paypal', 'momo','payeer') 
+        .allow('')
+        .label('Phương thức rút tiền'),
+    info_withdraw: Joi.string().max(MAX_STRING_SIZE).allow('').label('Thông tin rút tiền'),
+    country: Joi.string()
+        .trim()
+        .max(MAX_STRING_SIZE)
+        .allow('')
+        .label('Quốc gia')
+        .messages({ 'string.pattern.base': '{{#label}} không bao gồm số hay ký tự đặc biệt.' }),
 })
 
 export const changePassword = Joi.object({
