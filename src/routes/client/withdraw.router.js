@@ -1,4 +1,3 @@
-
 import { Router } from 'express'
 import * as withdrawController from '@/app/controllers/client/withdraw.controller'
 import { asyncHandler } from '@/utils/helpers'
@@ -13,6 +12,12 @@ router.post(
     asyncHandler(requireAuthentication),
     asyncHandler(validate(withdrawRequest.createWithdrawRequest)),
     asyncHandler(withdrawController.createWithdrawRequest)
+)
+
+router.get(
+    '/',
+    requireAuthentication,
+    asyncHandler(withdrawController.getAllWithdrawRequests)
 )
 
 export default router

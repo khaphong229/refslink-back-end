@@ -44,6 +44,11 @@ const WithdrawSchema = {
         type: Date,
         default: Date.now,
     },
+    withdraw_code: {
+        type: String,
+        required: true,
+        unique: true,
+    },
 }
 
 const Withdraw = createModel('Withdraw', 'withdraws', WithdrawSchema)
