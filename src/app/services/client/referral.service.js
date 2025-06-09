@@ -2,6 +2,7 @@ import { APP_URL_CLIENT } from '@/configs'
 import Referal from '@/models/client/referral'
 import User from '@/models/client/user'
 import { getCommissionSettings } from '../admin/commission.service'
+import { formatDecimal } from '@/utils/formatDecimal'
 
 async function createOrUpdateReferral(userId) {
     const { ref_percent } = await getCommissionSettings()
@@ -18,7 +19,7 @@ async function createOrUpdateReferral(userId) {
 
     if (!referral) {
         const data = {
-            ref_link: user.ref_code,
+            ref_link: `${APP_URL_CLIENT}/user/register?ref=${user.ref_code || ''}`,
             user_id: userId,
             user_ref: usersReferred.map((user) => user._id),
             total_earnings: totalEarnings,
@@ -92,7 +93,7 @@ export async function getReferredUsers(req, res) {
 
     const transformedUsers = referedUsers.map((user) => ({
         ...user.toObject(),
-        total_earned: user.total_earned * ref_percent,
+        total_earned: formatDecimal((user.total_earned || 0) * ref_percent),
     }))
 
     return transformedUsers

@@ -3,6 +3,7 @@ import { startOfMonth, endOfMonth, eachDayOfInterval, format, startOfDay, endOfD
 import ClickLog from '@/models/client/click-log'
 import ReferralLog from '@/models/client/referral-log'
 import { formatDecimal } from '@/utils/formatDecimal'
+import { getCommissionSettings } from '../admin/commission.service'
 
 // Hàm kiểm tra và xử lý tham số tháng năm
 function validateMonthYear(month, year) {
@@ -187,6 +188,8 @@ async function generateTableData(userId, days, startDate, endDate) {
 
 // Hàm chính
 export async function getStatistics(req) {
+    const { cpm } = getCommissionSettings()
+
     const user_id = req.currentUser._id
     let { month, year } = req.query
 
@@ -225,6 +228,9 @@ export async function getStatistics(req) {
         total_earned_view: formatDecimal(totalEarnedView),
         total_earned_referral: formatDecimal(totalEarnedReferral),
         total_earned: formatDecimal(totalEarned),
+        rate: {
+            cpm,
+        },
         period: {
             month,
             year,

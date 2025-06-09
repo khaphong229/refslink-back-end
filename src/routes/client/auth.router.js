@@ -53,8 +53,13 @@ authRouter.get(
     }
 )
 
-
 authRouter.get('/me', asyncHandler(requireAuthentication), asyncHandler(authController.me))
+
+authRouter.get(
+    '/update-earnings',
+    asyncHandler(requireAuthentication),
+    asyncHandler(authController.updateUserEarnings)
+)
 
 authRouter.put(
     '/me',

@@ -1,23 +1,22 @@
 import { LINK_RESET_PASSWORD_URL, LINK_VERIFICATION_ACCOUNT, TOKEN_TYPE } from '@/configs'
 import { abort, generateToken, getToken } from '@/utils/helpers'
-import * as authService from '../../services/client/auth.service'
+import * as authService from '@/app/services/client/auth.service'
 import * as userService from '../../services/admin/user.service'
 import jwt from 'jsonwebtoken'
-import { User } from '@/models'
+import User from '@/models/client/user'
+import { updateAllUserLinksEarnings } from '@/app/services/client/shorten-link-earning.service'
 
 export async function login(req, res) {
     const [validLogin, user] = await authService.checkValidLogin(req.body)
 
     if (!validLogin) {
-        return abort(400, user) 
+        return abort(400, user)
     }
 
     const token = authService.authToken(user)
 
     res.jsonify(token)
 }
-
-
 
 export async function register(req, res) {
     const newUser = await authService.register(req.body)
@@ -32,9 +31,6 @@ export async function register(req, res) {
     }
     res.status(200).jsonify('Gửi yêu cầu xác minh tài khoản thành công! Vui lòng kiểm tra email.')
 }
-
-
-
 
 export async function verifyEmailToken(req, res) {
     const { token } = req.params
@@ -52,7 +48,6 @@ export async function verifyEmailToken(req, res) {
         res.status(400).jsonify('Token không hợp lệ hoặc đã hết hạn.')
     }
 }
-
 
 export async function logout(req, res) {
     const token = getToken(req.headers)
@@ -93,19 +88,19 @@ export async function resetPassword(req, res) {
 export async function loginSuccess(req, res) {
     const token = req.query.token
     if (!token) {
-        return res.status(400).jsonify({ 
+        return res.status(400).jsonify({
             status: 400,
             success: false,
             message: 'Token không hợp lệ',
-            data: null
+            data: null,
         })
     }
-    
+
     try {
         // Lấy thông tin user từ token
         const decoded = req.user
         const user = await authService.profile(decoded?._id || decoded?.user_id)
-        
+
         // Trả về định dạng JSON theo yêu cầu
         res.status(200).jsonify({
             status: 200,
@@ -113,15 +108,17 @@ export async function loginSuccess(req, res) {
             message: 'Login successful',
             data: {
                 access_token: token,
-                expires_in: 3600, 
+                expires_in: 3600,
                 token_type: 'Bearer',
-                user: user ? {
-                    id: user._id.toString(),
-                    name: user.name || user.full_name || '',
-                    email: user.email || '',
-                    avatar: user.avatar || ''
-                } : null
-            }
+                user: user
+                    ? {
+                        id: user._id.toString(),
+                        name: user.name || user.full_name || '',
+                        email: user.email || '',
+                        avatar: user.avatar || '',
+                    }
+                    : null,
+            },
         })
     } catch (error) {
         console.error('Error in login success handler:', error)
@@ -129,9 +126,22 @@ export async function loginSuccess(req, res) {
             status: 500,
             success: false,
             message: 'Đã xảy ra lỗi khi xử lý token',
-            data: null
+            data: null,
         })
     }
 }
 
-
+export async function updateUserEarnings(req, res) {
+    try {
+        const userId = req.currentUser._id
+        await updateAllUserLinksEarnings(userId)
+        const user = await User.findById(userId)
+        res.jsonify({
+            balance: user.balance,
+            total_earned: user.total_earned,
+        })
+    } catch (error) {
+        console.error('Error updating user earnings:', error)
+        res.status(500).jsonify('Có lỗi xảy ra khi cập nhật thông tin thu nhập')
+    }
+}
