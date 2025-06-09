@@ -8,27 +8,54 @@ import {abort, getToken, verifyToken} from '@/utils/helpers'
 async function requireAuthentications(req, res, next) {
     try {
         const token = getToken(req.headers)
-        if (token) {
-            const allowedToken = _.isUndefined(await tokenBlocklist.get(token))
-            if (allowedToken) {
-                const {user_id} = verifyToken(token, TOKEN_TYPE.AUTHORIZATION)
-                const admin = await Admin.findOne({_id: user_id})
-                if (admin) {
-                    req.currentUser = admin
-                    next()
-                    return
-                }
-            }
+        if (!token) {
+            return res.status(401).json({
+                status: 401,
+                success: false,
+                message: 'Vui lòng đăng nhập để tiếp tục.'
+            })
         }
+
+        const allowedToken = _.isUndefined(await tokenBlocklist.get(token))
+        if (!allowedToken) {
+            return res.status(401).json({
+                status: 401,
+                success: false,
+                message: 'Vui lòng đăng nhập để tiếp tục.'
+            })
+        }
+
+        const {user_id} = verifyToken(token, TOKEN_TYPE.AUTHORIZATION)
+        const admin = await Admin.findOne({_id: user_id})
+        if (!admin) {
+            return res.status(401).json({
+                status: 401,
+                success: false,
+                message: 'Vui lòng đăng nhập để tiếp tục.'
+            })
+        }
+
+        req.currentUser = admin
+        next()
     } catch (error) {
-        if (!(error instanceof JsonWebTokenError)) {
-            throw error
-        }
         if (error instanceof TokenExpiredError) {
-            abort(401, 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập để tiếp tục!')
+            return res.status(401).json({
+                status: 401,
+                success: false,
+                message: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập để tiếp tục!'
+            })
         }
+        
+        if (error instanceof JsonWebTokenError) {
+            return res.status(401).json({
+                status: 401,
+                success: false,
+                message: 'Vui lòng đăng nhập để tiếp tục.'
+            })
+        }
+
+        throw error
     }
-    abort(401)
 }
 
 export default requireAuthentications
