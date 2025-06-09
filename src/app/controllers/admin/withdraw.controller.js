@@ -14,8 +14,9 @@ export async function updateWithdrawStatus(req, res) {
 
 export async function getAllWithdrawRequests(req, res) {
     try {
-        const withdraws = await withdrawService.getAllWithdrawRequests()
-        res.status(200).json(withdraws)
+        const { page, limit, status, sort, from, to } = req.query
+        const result = await withdrawService.getAllWithdrawRequests({ page, limit, status, sort, from, to })
+        res.status(200).json(result)
     } catch (error) {
         abort(400, error.message)
     }
