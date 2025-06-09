@@ -1,65 +1,149 @@
 import ShortenLink from '@/models/client/shorten-link'
-import { startOfMonth, endOfMonth, eachDayOfInterval, format } from 'date-fns'
-import { getCommissionSettings } from '../admin/commission.service'
+import { startOfMonth, endOfMonth, eachDayOfInterval, format, startOfDay, endOfDay } from 'date-fns'
+import ClickLog from '@/models/client/click-log'
+import ReferralLog from '@/models/client/referral-log'
+import { formatDecimal } from '@/utils/formatDecimal'
 
-export async function getStatistics(req) {
-    const user_id = req.currentUser._id
-    let { month, year } = req.query
-
-    month = parseInt(month)
-    year = parseInt(year)
-
+// Hàm kiểm tra và xử lý tham số tháng năm
+function validateMonthYear(month, year) {
     if (isNaN(month) || isNaN(year)) {
         throw new Error('Tháng và năm bắt buộc là số')
     }
-
     if (month < 1 || month > 12) {
         throw new Error('Tháng phải nằm từ 1 đến 12')
     }
-
     if (year < 2000 || year > 2100) {
         throw new Error('Năm phải nằm từ 2000 đến 2100')
     }
+}
 
-    const startDate = startOfMonth(new Date(year, month - 1))
-    const today = new Date()
-    const endDate =
-        today < endOfMonth(new Date(year, month - 1)) ? today : endOfMonth(new Date(year, month - 1))
-
-    const links = await ShortenLink.find({
-        user_id,
-        created_at: {
-            $gte: startDate,
-            $lte: endDate,
+// Hàm lấy thống kê tổng quan từ ClickLog
+async function getClickStatistics(userId, startDate, endDate) {
+    return await ClickLog.aggregate([
+        {
+            $match: {
+                user_id: userId,
+                created_at: { $gte: startDate, $lte: endDate },
+                is_valid: true,
+            },
         },
-    })
+        {
+            $group: {
+                _id: null,
+                total_valid_views: { $sum: 1 },
+                total_earned_view: { $sum: '$earned_amount' },
+            },
+        },
+    ])
+}
 
-    const { cpm, ref_percent } = await getCommissionSettings()
-    console.log(cpm, ref_percent)
+// Hàm lấy thống kê tổng quan từ ReferralLog
+async function getReferralStatistics(userId, startDate, endDate) {
+    return await ReferralLog.aggregate([
+        {
+            $match: {
+                user_id: userId,
+                created_at: { $gte: startDate, $lte: endDate },
+            },
+        },
+        {
+            $group: {
+                _id: null,
+                total_earned_referral: { $sum: '$earned_amount' },
+            },
+        },
+    ])
+}
 
-    const totalViews = links.reduce((sum, link) => sum + (link.click_count || 0), 0)
-    const totalValidViews = links.reduce((sum, link) => sum + (link.valid_clicks || 0), 0)
-    const ratePerView = cpm / 1000 // cpm per 1000 views
-    const totalEarned = totalValidViews * ratePerView
+// Hàm lấy thống kê chi tiết theo ngày từ ClickLog
+async function getDailyClickStatistics(userId, startDate, endDate) {
+    return await ClickLog.aggregate([
+        {
+            $match: {
+                user_id: userId,
+                created_at: { $gte: startDate, $lte: endDate },
+                is_valid: true,
+            },
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: '%Y-%m-%d', date: '$created_at' } },
+                views: { $sum: 1 },
+                income: { $sum: '$earned_amount' },
+            },
+        },
+    ])
+}
 
-    // Tạo dữ liệu cho biểu đồ (theo ngày)
-    const days = eachDayOfInterval({ start: startDate, end: endDate })
-    const chartData = days.map((day) => {
-        const dayLinks = links.filter(
-            (link) => format(new Date(link.created_at), 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
-        )
-        const dayViews = dayLinks.reduce((sum, link) => sum + (link.click_count || 0), 0)
-        const dayValidViews = dayLinks.reduce((sum, link) => sum + (link.valid_clicks || 0), 0)
-        const dayEarned = dayValidViews * ratePerView
+// Hàm lấy thống kê chi tiết theo ngày từ ReferralLog
+async function getDailyReferralStatistics(userId, startDate, endDate) {
+    return await ReferralLog.aggregate([
+        {
+            $match: {
+                user_id: userId,
+                created_at: { $gte: startDate, $lte: endDate },
+            },
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: '%Y-%m-%d', date: '$created_at' } },
+                referral_earnings: { $sum: '$earned_amount' },
+            },
+        },
+    ])
+}
 
-        return {
-            date: format(day, 'yyyy-MM-dd'),
-            views: dayViews,
-            earned: parseFloat(dayEarned.toFixed(2)),
-        }
-    })
+// Hàm tạo dữ liệu cho biểu đồ
+async function generateChartData(userId, days) {
+    return await Promise.all(
+        days.map(async (day) => {
+            const dayStart = startOfDay(day)
+            const dayEnd = endOfDay(day)
 
-    // Tạo dữ liệu chi tiết cho bảng theo ngày
+            const dayClickStats = await ClickLog.aggregate([
+                {
+                    $match: {
+                        user_id: userId,
+                        created_at: { $gte: dayStart, $lte: dayEnd },
+                        is_valid: true,
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        views: { $sum: 1 },
+                        earned: { $sum: '$earned_amount' },
+                    },
+                },
+            ])
+
+            const dayReferralStats = await ReferralLog.aggregate([
+                {
+                    $match: {
+                        user_id: userId,
+                        created_at: { $gte: dayStart, $lte: dayEnd },
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        referral_earnings: { $sum: '$earned_amount' },
+                    },
+                },
+            ])
+
+            return {
+                date: format(day, 'yyyy-MM-dd'),
+                views: dayClickStats[0]?.views || 0,
+                earned: formatDecimal(dayClickStats[0]?.earned || 0),
+                referral_earnings: formatDecimal(dayReferralStats[0]?.referral_earnings || 0),
+            }
+        })
+    )
+}
+
+// Hàm tạo dữ liệu cho bảng
+async function generateTableData(userId, days, startDate, endDate) {
     const dailyStats = {}
     days.forEach((day) => {
         const dayStr = format(day, 'yyyy-MM-dd')
@@ -72,41 +156,75 @@ export async function getStatistics(req) {
         }
     })
 
-    // Tính toán thống kê cho từng ngày
-    links.forEach((link) => {
-        const dayStr = format(new Date(link.created_at), 'yyyy-MM-dd')
-        if (dailyStats[dayStr]) {
-            const views = link.click_count || 0
-            const validViews = link.valid_clicks || 0
-            const income = validViews * ratePerView
-            const cpm = views > 0 ? (income / views) * 1000 : 0
-            const referralEarning = income * ref_percent // referral
+    const dailyClickStats = await getDailyClickStatistics(userId, startDate, endDate)
+    const dailyReferralStats = await getDailyReferralStatistics(userId, startDate, endDate)
 
-            dailyStats[dayStr].views += views
-            dailyStats[dayStr].income += income
-            dailyStats[dayStr].cpm = parseFloat(cpm.toFixed(2))
-            dailyStats[dayStr].referral_earnings += parseFloat(referralEarning.toFixed(2))
+    dailyClickStats.forEach((stat) => {
+        const dayStr = stat._id
+        if (dailyStats[dayStr]) {
+            dailyStats[dayStr].views = stat.views
+            dailyStats[dayStr].income = formatDecimal(stat.income)
+            dailyStats[dayStr].cpm = stat.views > 0 ? formatDecimal((stat.income / stat.views) * 1000) : 0
         }
     })
 
-    // Chuyển đổi object thành array và sắp xếp theo ngày mới nhất
-    const tableData = Object.values(dailyStats)
+    dailyReferralStats.forEach((stat) => {
+        const dayStr = stat._id
+        if (dailyStats[dayStr]) {
+            dailyStats[dayStr].referral_earnings = formatDecimal(stat.referral_earnings)
+        }
+    })
+
+    return Object.values(dailyStats)
         .map((day) => ({
             ...day,
-            income: parseFloat(day.income.toFixed(2)),
-            referral_earnings: parseFloat(day.referral_earnings.toFixed(2)),
+            income: formatDecimal(day.income),
+            referral_earnings: formatDecimal(day.referral_earnings),
+            total_earned: formatDecimal(day.income + day.referral_earnings),
         }))
         .sort((a, b) => new Date(b.date) - new Date(a.date))
+}
+
+// Hàm chính
+export async function getStatistics(req) {
+    const user_id = req.currentUser._id
+    let { month, year } = req.query
+
+    month = parseInt(month)
+    year = parseInt(year)
+    validateMonthYear(month, year)
+
+    const startDate = startOfMonth(new Date(year, month - 1))
+    const today = new Date()
+    const endDate =
+        today < endOfMonth(new Date(year, month - 1)) ? today : endOfMonth(new Date(year, month - 1))
+
+    const [clickStats, referralStats] = await Promise.all([
+        getClickStatistics(user_id, startDate, endDate),
+        getReferralStatistics(user_id, startDate, endDate),
+    ])
+
+    const totalLinks = await ShortenLink.countDocuments({
+        user_id,
+        created_at: { $gte: startDate, $lte: endDate },
+    })
+
+    const totalEarnedView = clickStats[0]?.total_earned_view || 0
+    const totalEarnedReferral = referralStats[0]?.total_earned_referral || 0
+    const totalEarned = totalEarnedView + totalEarnedReferral
+
+    const days = eachDayOfInterval({ start: startDate, end: endDate })
+    const [chartData, tableData] = await Promise.all([
+        generateChartData(user_id, days),
+        generateTableData(user_id, days, startDate, endDate),
+    ])
 
     return {
-        total_links: links.length,
-        total_views: totalViews,
-        total_valid_views: totalValidViews,
-        total_earned: parseFloat(totalEarned.toFixed(2)),
-        rate: {
-            per_1000_views: cpm,
-            currency: 'USD',
-        },
+        total_links: totalLinks,
+        total_valid_views: clickStats[0]?.total_valid_views || 0,
+        total_earned_view: formatDecimal(totalEarnedView),
+        total_earned_referral: formatDecimal(totalEarnedReferral),
+        total_earned: formatDecimal(totalEarned),
         period: {
             month,
             year,

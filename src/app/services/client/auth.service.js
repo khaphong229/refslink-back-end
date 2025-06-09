@@ -7,6 +7,7 @@ import { generateToken } from '@/utils/helpers'
 import { generateRefCode } from '@/utils/generateCode'
 import { handleUserLogin, handleUserRegistration } from './referral.service'
 import { updateUserBalance } from './balance.service'
+import { updateAllUserLinksEarnings } from './shorten-link-earning.service'
 
 export const tokenBlocklist = cache.create('token-block-list')
 
@@ -17,6 +18,7 @@ export async function checkValidLogin({ email, password }) {
         const verified = user.verifyPassword(password)
         if (verified) {
             await handleUserLogin(user._id)
+            await updateAllUserLinksEarnings(user._id)
             await updateUserBalance(user._id)
             return [true, user]
         }
