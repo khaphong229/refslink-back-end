@@ -23,6 +23,7 @@ import routeClient from './routes/client'
 import publicRedirectRouter from './routes/public-redirect.router.js'
 import generateScriptRouter from './routes/generateScript.js'
 import googleAuthRouter from './routes/client/google-auth.router.js'
+import topLinksRouter from './routes/client/top-links.router.js'
 
 function createApp() {
     // Init app
@@ -139,6 +140,9 @@ function createApp() {
 
     // API generate script
     app.use('/api/generate-script', generateScriptRouter)
+
+    // Top Links API
+    app.use('/api/top-links', topLinksRouter)
 
     // Public router for everyone
     app.use('/', publicRedirectRouter)
