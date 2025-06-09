@@ -36,11 +36,12 @@ authRouter.get(
         console.log('Print REQ')
         console.log(req.user)
         console.log('Print RES')
-        // console.log(res)   
+        // console.log(res)
         try {
             if (!req.user) {
                 console.error('No user found in request after Google authentication')
-                return res.status(400).json({  // sửa jsonify thành json
+                return res.status(400).json({
+                    // sửa jsonify thành json
                     status: 400,
                     success: false,
                     message: 'Không tìm thấy thông tin người dùng sau khi xác thực Google',
@@ -53,7 +54,8 @@ authRouter.get(
             console.log('Authentication successful. Returning token...')
             console.log(result)
 
-            res.status(200).json({   // sửa jsonify thành json
+            res.status(200).json({
+                // sửa jsonify thành json
                 status: 200,
                 success: true,
                 message: 'Login successful',
@@ -71,7 +73,8 @@ authRouter.get(
             })
         } catch (error) {
             console.error('Error in Google callback:', error)
-            res.status(500).json({   // sửa jsonify thành json
+            res.status(500).json({
+                // sửa jsonify thành json
                 status: 500,
                 success: false,
                 message: 'Đã xảy ra lỗi khi xử lý đăng nhập Google',
@@ -81,8 +84,13 @@ authRouter.get(
     }
 )
 
-
 authRouter.get('/me', asyncHandler(requireAuthentication), asyncHandler(authController.me))
+
+authRouter.get(
+    '/update-earnings',
+    asyncHandler(requireAuthentication),
+    asyncHandler(authController.updateUserEarnings)
+)
 
 authRouter.put(
     '/me',
