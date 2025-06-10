@@ -5,7 +5,6 @@ import ReferralLog from '@/models/client/referral-log'
 import { formatDecimal } from '@/utils/formatDecimal'
 import { getCommissionSettings } from '../admin/commission.service'
 
-// Hàm kiểm tra và xử lý tham số tháng năm
 function validateMonthYear(month, year) {
     if (isNaN(month) || isNaN(year)) {
         throw new Error('Tháng và năm bắt buộc là số')
@@ -186,9 +185,8 @@ async function generateTableData(userId, days, startDate, endDate) {
         .sort((a, b) => new Date(b.date) - new Date(a.date))
 }
 
-// Hàm chính
 export async function getStatistics(req) {
-    const { cpm } = getCommissionSettings()
+    const { cpm } = await getCommissionSettings()
 
     const user_id = req.currentUser._id
     let { month, year } = req.query
