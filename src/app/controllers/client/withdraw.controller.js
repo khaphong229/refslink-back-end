@@ -21,7 +21,7 @@ export async function createWithdrawRequest(req, res) {
             payment_details: details,
             minAmount,
         })
-        res.status(201).json(withdraw)
+        res.status(201).jsonify(withdraw)
     } catch (error) {
         abort(400, error.message)
     }
@@ -32,7 +32,7 @@ export async function getAllWithdrawRequests(req, res) {
         const userId = req.currentUser._id
         const { page, limit, status, sort, from, to } = req.query
         const result = await withdrawService.getAllWithdrawRequestsByUser(userId, { page, limit, status, sort, from, to })
-        res.status(200).json(result)
+        res.status(200).jsonify(result)
     } catch (error) {
         abort(400, error.message)
     }
