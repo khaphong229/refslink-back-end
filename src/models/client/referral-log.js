@@ -17,8 +17,7 @@ const ReferralLogSchema = {
     },
     source: {
         type: String,
-        enum: ['shorten_link', 'other'],
-        default: 'shorten_link',
+        default: '',
     },
     created_at: {
         type: Date,

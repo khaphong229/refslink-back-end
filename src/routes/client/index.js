@@ -8,6 +8,7 @@ import shortenLinkRankingUserRouter from './shorten-link-ranking.client.router'
 import qrcodeRouter from './qrcode.router'
 import referalRouter from './referal.router'
 import withdrawRouter from './withdraw.router'
+import referralLogRouter from './referral-log.router'
 
 function routeClient(app) {
     app.use('/auth', authRouter)
@@ -20,6 +21,7 @@ function routeClient(app) {
     app.use('/qrcode', qrcodeRouter)
     app.use('/referal', referalRouter)
     app.use('/withdraw', withdrawRouter)
+    app.use('/referral-logs', referralLogRouter)
 }
 
 export default routeClient
