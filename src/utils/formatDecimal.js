@@ -1,3 +1,3 @@
 export function formatDecimal(number) {
-    return parseFloat(Number(number).toFixed(3))
+    return parseFloat(Number(number).toFixed(2))
 }

@@ -10,11 +10,21 @@ export const getReferralPercentSetting = async () => {
     return setting.value
 }
 
+export const getScheduledDateSetting = async () => {
+    const setting = await getSettingByName('time_paid')
+    return setting.value
+}
+
 export const getCommissionSettings = async () => {
-    const [cpm, refPercent] = await Promise.all([getCPMSetting(), getReferralPercentSetting()])
+    const [cpm, refPercent, paid_time] = await Promise.all([
+        getCPMSetting(),
+        getReferralPercentSetting(),
+        getScheduledDateSetting(),
+    ])
 
     return {
         cpm,
         ref_percent: refPercent,
+        paid_time,
     }
 }

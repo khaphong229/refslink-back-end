@@ -8,4 +8,4 @@ export async function getShortenLinksRankingUser({ user_id, sortBy = 'click_coun
         .limit(Number(limit))
         .lean()
     return data
-} 
+}

@@ -2,6 +2,7 @@ import Withdraw from '@/models/client/withdraw'
 import User from '@/models/client/user'
 import { formatDecimal } from '@/utils/formatDecimal'
 import { generateWithdrawCode } from '@/utils/generateAlias'
+import { getSettingByName } from '../admin/setting.service'
 
 function parseToDate(to) {
     if (!to) return null
@@ -21,6 +22,8 @@ export async function createWithdrawRequest({
     payment_details,
     minAmount,
 }) {
+    const time_paid = await getSettingByName('time_paid')
+
     const user = await User.findById(userId)
     if (!user) throw new Error('User not found')
 
@@ -31,6 +34,9 @@ export async function createWithdrawRequest({
     user.balance = formatDecimal(user.balance - amount_money)
     await user.save()
 
+    const scheduledPayment = new Date()
+    scheduledPayment.setDate(scheduledPayment.getDate() + time_paid?.value)
+
     const withdraw = await Withdraw.create({
         user_id: userId,
         amount_money,
@@ -38,11 +44,15 @@ export async function createWithdrawRequest({
         payment_details,
         status: 'pending',
         withdraw_code: generateWithdrawCode(),
+        scheduled_payment: scheduledPayment,
     })
     return withdraw
 }
 
-export async function getAllWithdrawRequestsByUser(userId, { page = 1, limit = 10, status, sort = 'desc', from, to } = {}) {
+export async function getAllWithdrawRequestsByUser(
+    userId,
+    { page = 1, limit = 10, status, sort = 'desc', from, to } = {}
+) {
     const query = { user_id: userId }
     if (status) query.status = status
     if (from || to) {
@@ -52,17 +62,14 @@ export async function getAllWithdrawRequestsByUser(userId, { page = 1, limit = 1
     }
     const sortOption = { created_at: sort === 'asc' ? 1 : -1, status: 1 }
     const skip = (Number(page) - 1) * Number(limit)
-    const withdraws = await Withdraw.find(query)
-        .sort(sortOption)
-        .skip(skip)
-        .limit(Number(limit))
+    const withdraws = await Withdraw.find(query).sort(sortOption).skip(skip).limit(Number(limit))
     const total = await Withdraw.countDocuments(query)
     return {
         data: withdraws,
         page: Number(page),
         limit: Number(limit),
         total,
-        totalPages: Math.ceil(total / limit)
+        totalPages: Math.ceil(total / limit),
     }
 }
 
@@ -76,17 +83,14 @@ export async function getAllWithdrawRequests({ page = 1, limit = 10, status, sor
     }
     const sortOption = { created_at: sort === 'asc' ? 1 : -1, status: 1 }
     const skip = (Number(page) - 1) * Number(limit)
-    const withdraws = await Withdraw.find(query)
-        .sort(sortOption)
-        .skip(skip)
-        .limit(Number(limit))
+    const withdraws = await Withdraw.find(query).sort(sortOption).skip(skip).limit(Number(limit))
     const total = await Withdraw.countDocuments(query)
     return {
         data: withdraws,
         page: Number(page),
         limit: Number(limit),
         total,
-        totalPages: Math.ceil(total / limit)
+        totalPages: Math.ceil(total / limit),
     }
 }
 
