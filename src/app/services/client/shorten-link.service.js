@@ -122,6 +122,9 @@ export async function goLink({ alias, user_id, ip, country, device, browser, ref
     const dataLink = await ShortenLink.findOne({ alias: alias })
     if (!dataLink) return null
 
+    console.log('user country:', country)
+    console.log('user ip:', ip)
+
     await ClickLog.create({
         link_id: dataLink._id,
         user_id: user_id || dataLink.user_id || null,

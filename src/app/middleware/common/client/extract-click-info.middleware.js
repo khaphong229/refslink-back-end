@@ -1,7 +1,12 @@
+import geoip from 'geoip-lite'
 
 function extractClickInfo(req, res, next) {
     const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.connection?.remoteAddress || ''
-    const country = req.headers['x-country-code'] || ''
+    let country = req.headers['x-country-code'] || ''
+    if (!country && ip) {
+        const geo = geoip.lookup(ip)
+        country = geo?.country || ''
+    }
     const referer = req.headers['referer'] || req.headers['referrer'] || ''
     let device = ''
     let browser = ''
