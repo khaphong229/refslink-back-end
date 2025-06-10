@@ -53,3 +53,5 @@ export async function remove(user) {
     }
     await User.deleteOne({_id: user._id})
 }
+
+// Xóa các hàm thống kê đã chuyển sang statistic.service.js

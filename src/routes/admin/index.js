@@ -6,6 +6,7 @@ import supportRouter from '../admin/support.router'
 import shortenLinkRankingAdminRouter from './shorten-link-ranking.admin.router'
 import settingRouter from './setting.router'
 import withdrawRouter from './withdraw.router'
+import statisticRouter from './statistic.router'
 
 function routeAdmin(app) {
     const PATH_ADMIN = prefixAdmin
@@ -16,6 +17,7 @@ function routeAdmin(app) {
     app.use(PATH_ADMIN + '/settings', settingRouter)
     app.use('/upload', uploadRouter)
     app.use(PATH_ADMIN + '/withdraw', withdrawRouter)
+    app.use(PATH_ADMIN + '/statistic', statisticRouter)
 }
 
 export default routeAdmin
