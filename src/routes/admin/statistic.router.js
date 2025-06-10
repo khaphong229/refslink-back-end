@@ -9,5 +9,6 @@ router.use(asyncHandler(requireAuthentications))
 
 router.get('/users', asyncHandler(StatisticController.getUserStatistics))
 router.get('/shorten-links', asyncHandler(StatisticController.getLinkStatistics))
+router.get('/shorten-links/by-date', asyncHandler(StatisticController.getLinkStatisticsByDateController))
 
 export default router

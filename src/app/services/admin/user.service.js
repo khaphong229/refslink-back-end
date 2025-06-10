@@ -1,7 +1,6 @@
 import {User} from '@/models'
 import {FileUpload} from '@/utils/classes'
 import {LINK_STATIC_URL} from '@/configs'
-import ShortenLink from '@/models/client/shorten-link'
 
 export async function create(requestBody) {
     const user = new User(requestBody)
@@ -55,16 +54,4 @@ export async function remove(user) {
     await User.deleteOne({_id: user._id})
 }
 
-export async function getUserStatistics() {
-    const totalUsers = await User.countDocuments({})
-    const activeUsers = await User.countDocuments({ status: 'active' })
-    const inactiveUsers = await User.countDocuments({ status: { $ne: 'active' } })
-    return { totalUsers, activeUsers, inactiveUsers }
-}
-
-export async function getLinkStatistics() {
-    const totalLinks = await ShortenLink.countDocuments({})
-    const activeLinks = await ShortenLink.countDocuments({ status: 'active' })
-    const inactiveLinks = await ShortenLink.countDocuments({ status: { $ne: 'active' } })
-    return { totalLinks, activeLinks, inactiveLinks }
-}
+// Xóa các hàm thống kê đã chuyển sang statistic.service.js

@@ -1,8 +1,8 @@
-import * as UserService from '@/app/services/admin/user.service'
+import * as StatisticService from '@/app/services/admin/statistic.service'
 
 export async function getUserStatistics(req, res) {
     try {
-        const result = await UserService.getUserStatistics()
+        const result = await StatisticService.getUserStatistics()
         res.status(200).jsonify(result)
     } catch (error) {
         res.status(500).jsonify({ message: error.message })
@@ -11,8 +11,18 @@ export async function getUserStatistics(req, res) {
 
 export async function getLinkStatistics(req, res) {
     try {
-        const result = await UserService.getLinkStatistics()
+        const result = await StatisticService.getLinkStatistics()
         res.status(200).jsonify(result)
+    } catch (error) {
+        res.status(500).jsonify({ message: error.message })
+    }
+}
+
+export async function getLinkStatisticsByDateController(req, res) {
+    try {
+        const { from, to } = req.query
+        const stats = await StatisticService.getLinkStatisticsByDate({ from, to })
+        res.status(200).jsonify(stats)
     } catch (error) {
         res.status(500).jsonify({ message: error.message })
     }
