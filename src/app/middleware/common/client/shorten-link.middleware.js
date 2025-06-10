@@ -196,14 +196,70 @@ export async function checkValidLink(url) {
     return true
 }
 
-export async function checkShortenLink(req, res, next) {
+export async function checkShortenLink(req, res, next, type = null) {
+    // Handle mutiple URL case
+    if (type === 'multiple') {
+        const urls = req.body.urls
+        if (!urls || !Array.isArray(urls)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Array of URLs is required',
+            })
+        }
+
+        const results = await Promise.all(
+            urls.map(async (url) => {
+                if (!(await checkValidLink(url))) {
+                    return {
+                        url,
+                        error: 'Link chứa nội dung vi phạm chính sách cộng đồng, không được phép rút gọn.',
+                    }
+                }
+                const result = await ShortenLink.findOne({ original_link: url, user_id: req.currentUser._id })
+                if (result) {
+                    return {
+                        url,
+                        exists: true,
+                        data: pick(result, ['_id', 'alias', 'shorten_link', 'created_at', 'updated_at']),
+                    }
+                }
+                return { url, exists: false }
+            })
+        )
+
+        const invalidUrls = results.filter((r) => r.error)
+        if (invalidUrls.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Link chứa nội dung vi phạm chính sách cộng đồng, không được phép rút gọn.',
+                invalidUrls,
+            })
+        }
+
+        if (results.every((r) => r.exists)) {
+            return res.status(201).json({
+                status: 201,
+                success: true,
+                message: 'Created',
+                data: results.map((r) => ({
+                    message: 'success',
+                    data: r.data,
+                })),
+            })
+        }
+
+        req.existingUrls = results
+        req.type = 'multiple'
+        return next()
+    }
+
+    // Handle single URL case
     const { original_link: url } = req.body
     if (!url) abort(404, 'Vui lòng nhập link cần rút gọn.')
 
     const result = await ShortenLink.findOne({ original_link: url, user_id: req.currentUser._id })
 
     if (!(await checkValidLink(url))) {
-        console.log(url)
         abort(404, 'Link chứa nội dung vi phạm chính sách cộng đồng, không được phép rút gọn.')
     }
 
@@ -226,11 +282,31 @@ export async function getApiWebActive(req, res, next) {
         req.apiWebActive = null
         next()
         return
-        // return abort(404, 'Không tìm thấy api web nào đang hoạt động.')
     }
+
+    const now = new Date()
+    data = data.filter((api) => {
+        if (
+            typeof api.max_view === 'number' &&
+            typeof api.current_view === 'number' &&
+            api.current_view >= api.max_view
+        )
+            return false
+
+        if (api.timer && api.timer_start && api.timer_end) {
+            if (!(now >= api.timer_start && now <= api.timer_end)) return false
+        }
+        return true
+    })
+
+    if (!data || data.length === 0) {
+        req.apiWebActive = null
+        next()
+        return
+    }
+
     data = data.sort((a, b) => a.priority - b.priority)
     req.apiWebActive = data[0]
-
     next()
     return
 }

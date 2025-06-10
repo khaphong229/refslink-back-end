@@ -1,7 +1,7 @@
 import ShortenTool from '@/models/client/shorten-tool'
 import User from '@/models/client/user'
 import * as shortenLinkMiddleWare from '@/app/middleware/common/client/shorten-link.middleware'
-
+import { abort } from '@/utils/helpers'
 
 export async function validateGetTokenRequest(req, res, next) {
     const userId = req.currentUser?._id
@@ -58,43 +58,38 @@ export async function validateShortenToolRequest(req, res, next) {
     return await shortenLinkMiddleWare.checkShortenLink(req, res, next)
 }
 
-export async function validateBulkShortenRequest(req, res, next) {
-    const { token, urls } = req.body
+export function validateBulkShortenRequest(req, res, next) {
+    const { urls } = req.body
 
-    if (!token || !urls || !Array.isArray(urls)) {
+    if (!urls || !Array.isArray(urls)) {
         return res.status(400).json({
             success: false,
             message: 'API token and array of URLs are required',
         })
     }
+    next()
+}
 
-    try {
-        const data = await ShortenTool.findOne({ token })
+export async function validateDevelopApi(req, res, next) {
+    const { api, url, alias } = req.query
 
-        if (!data) {
-            return res.status(401).json({
-                success: false,
-                message: 'Không tìm thấy ShortenTool với token này',
-            })
-        }
-
-        const user = await User.findOne({ _id: data.user_id })
-
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: 'Không tìm thấy user tương ứng với token',
-            })
-        }
-
-        req.currentUser = user
-        next()
-    } catch (err) {
-        console.error('Lỗi khi truy vấn ShortenTool hoặc User:', err.message)
-        return res.status(500).json({
-            success: false,
-            message: 'Đã xảy ra lỗi nội bộ server',
-            error: err.message,
-        })
+    if (!api || !url || !alias) {
+        abort(404, 'Vui lòng nhập đầy đủ tham số.')
     }
+
+    const data = await ShortenTool.findOne({ token: api })
+    if (!data) {
+        abort(404, 'API không hợp lệ.')
+    }
+
+    const user = await User.findById(data.user_id)
+    if (!user) {
+        abort(404, 'Người dùng không tồn tại')
+    }
+
+    req.currentUser = user
+    req.data = { api, url, alias }
+    req.body.original_link = url
+
+    return await shortenLinkMiddleWare.checkShortenLink(req, res, next)
 }

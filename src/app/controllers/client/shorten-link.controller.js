@@ -43,6 +43,14 @@ export async function deleteByID(req, res) {
 }
 
 export async function goLink(req, res) {
-    const data = await shortenLinkService.goLink(req.body, req)
+    const { alias } = req.body
+    const user_id = req.currentUser?._id
+    const { ip, country, device, browser, referer } = req.clickInfo || {}
+    const data = await shortenLinkService.goLink({ alias, user_id, ip, country, device, browser, referer })
+    res.status(201).jsonify(data)
+}
+
+export async function goLinkValid(req, res) {
+    const data = await shortenLinkService.goLinkValid(req.body, req)
     res.status(201).jsonify(data)
 }

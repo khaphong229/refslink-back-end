@@ -23,7 +23,7 @@ router.post('/', requireAuthentication, async (req, res) => {
         }
 
         // Cấu hình
-        const app_url = 'http://localhost:3111/'
+        const app_url = 'https://deploy-be-resfink.onrender.com'
         const app_type = JSON.stringify(type)
         const app_api_token = shortenTool.token
         const app_advert = typeof advert === 'number' ? advert : 2
@@ -45,7 +45,10 @@ router.post('/', requireAuthentication, async (req, res) => {
             status: 200,
             success: true,
             message: 'OK',
-            data: scriptContent
+            data: {
+                total: Array.isArray(domains) ? domains.length : 0,
+                data: scriptContent
+            }
         })
 
     } catch (error) {

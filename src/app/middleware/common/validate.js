@@ -1,7 +1,7 @@
 import Joi from 'joi'
 import _ from 'lodash'
 import assert from 'assert'
-import {abort, validateAsync} from '@/utils/helpers'
+import { abort, validateAsync } from '@/utils/helpers'
 
 function validate(schema) {
     assert(Joi.isSchema(schema), new TypeError('"schema" must be a Joi schema.'))

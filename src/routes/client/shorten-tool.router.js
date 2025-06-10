@@ -1,6 +1,6 @@
 import express from 'express'
 import * as shortenToolMiddleware from '@/app/middleware/common/client/shorten-tool.middleware'
-import * as shortenToolController  from '@/app/controllers/client/shorten-tool.controller'
+import * as shortenToolController from '@/app/controllers/client/shorten-tool.controller'
 import requireAuthentication from '@/app/middleware/common/client/require-authentication'
 
 import * as shortenLinkMiddleWare from '@/app/middleware/common/client/shorten-link.middleware'
@@ -17,17 +17,25 @@ router.get(
 )
 
 router.get(
-    '/st', 
-    asyncHandler(shortenToolMiddleware.validateShortenToolRequest), 
+    '/st',
+    asyncHandler(shortenToolMiddleware.validateShortenToolRequest),
     asyncHandler(shortenLinkMiddleWare.getApiWebActive),
-    asyncHandler(shortenToolController.shortenUrl)
+    (req, res) => shortenToolController.shortenUrl(req, res, 'quicklink')
 )
 
 router.post(
-    '/st/bulk', 
-    asyncHandler(shortenToolMiddleware.validateBulkShortenRequest), 
+    '/st/bulk',
+    asyncHandler(requireAuthentication),
+    (req, res, next) => shortenLinkMiddleWare.checkShortenLink(req, res, next, 'multiple'),
     asyncHandler(shortenLinkMiddleWare.getApiWebActive),
     asyncHandler(shortenToolController.shortenBulkUrls)
 )
 
-export default router 
+router.get(
+    '/api',
+    asyncHandler(shortenToolMiddleware.validateDevelopApi),
+    asyncHandler(shortenLinkMiddleWare.getApiWebActive),
+    asyncHandler(shortenToolController.shortenDevelopApi)
+)
+
+export default router
