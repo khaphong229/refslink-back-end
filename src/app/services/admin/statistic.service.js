@@ -48,7 +48,7 @@ export async function getLinkStatisticsByDate() {
         { $sort: { _id: 1 } }
     ])
     stats = fillAllMonthsInYear(stats, currentYear)
-    return { data: stats }
+    return stats 
 }
 
 export async function getUserStatisticsByDate() {
@@ -74,7 +74,7 @@ export async function getUserStatisticsByDate() {
         { $sort: { _id: 1 } }
     ])
     stats = fillAllMonthsInYear(stats, currentYear)
-    return { data: stats }
+    return stats
 }
 
 export async function getDashboardSummary() {
