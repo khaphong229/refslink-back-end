@@ -15,34 +15,26 @@ export async function getLinkStatistics() {
     return { totalLinks, activeLinks, inactiveLinks }
 }
 
-
-export function fillMissingMonths(stats, from, to) {
-    const start = from ? new Date(from + '-01') : (stats[0]?._id ? new Date(stats[0]._id + '-01') : new Date())
-    const end = to ? new Date(to + '-01') : (stats[stats.length-1]?._id ? new Date(stats[stats.length-1]._id + '-01') : new Date())
+function fillAllMonthsInYear(stats, year) {
     const result = []
-    const current = new Date(start.getFullYear(), start.getMonth(), 1)
-    const last = new Date(end.getFullYear(), end.getMonth(), 1)
     const statsMap = Object.fromEntries(stats.map(item => [item._id, item.count]))
-    while (current <= last) {
-        const key = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2, '0')}`
+    for (let m = 1; m <= 12; m++) {
+        const key = `${year}-${String(m).padStart(2, '0')}`
         result.push({ _id: key, count: statsMap[key] || 0 })
-        current.setMonth(current.getMonth() + 1)
     }
     return result
 }
 
-export async function getLinkStatisticsByDate({ from, to }) {
+export async function getLinkStatisticsByDate() {
     const match = {}
-    if (from) match.created_at = { $gte: new Date(from) }
-    if (to) {
-        if (!match.created_at) match.created_at = {}
-        const toDate = new Date(to)
-        if (typeof to === 'string' && to.length === 10) {
-            toDate.setDate(toDate.getDate() + 1)
-            toDate.setMilliseconds(toDate.getMilliseconds() - 1)
-        }
-        match.created_at.$lte = toDate
-    }
+
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const from = `${currentYear}-01`
+    const to = `${currentYear}-12`
+    match.created_at = { $gte: new Date(from) }
+    const toDate = new Date(to)
+    match.created_at.$lte = toDate
     let stats = await ShortenLink.aggregate([
         { $match: match },
         {
@@ -55,22 +47,20 @@ export async function getLinkStatisticsByDate({ from, to }) {
         },
         { $sort: { _id: 1 } }
     ])
-    stats = await fillMissingMonths(stats, from, to)
+    stats = fillAllMonthsInYear(stats, currentYear)
     return { data: stats }
 }
 
-export async function getUserStatisticsByDate({ from, to }) {
+export async function getUserStatisticsByDate() {
     const match = {}
-    if (from) match.created_at = { $gte: new Date(from) }
-    if (to) {
-        if (!match.created_at) match.created_at = {}
-        const toDate = new Date(to)
-        if (typeof to === 'string' && to.length === 10) {
-            toDate.setDate(toDate.getDate() + 1)
-            toDate.setMilliseconds(toDate.getMilliseconds() - 1)
-        }
-        match.created_at.$lte = toDate
-    }
+
+    const now = new Date()
+    const currentYear = now.getFullYear()
+    const from = `${currentYear}-01`
+    const to = `${currentYear}-12`
+    match.created_at = { $gte: new Date(from) }
+    const toDate = new Date(to)
+    match.created_at.$lte = toDate
     let stats = await User.aggregate([
         { $match: match },
         {
@@ -83,22 +73,22 @@ export async function getUserStatisticsByDate({ from, to }) {
         },
         { $sort: { _id: 1 } }
     ])
-    stats = await fillMissingMonths(stats, from, to)
+    stats = fillAllMonthsInYear(stats, currentYear)
     return { data: stats }
 }
 
 export async function getDashboardSummary() {
-    // Tổng view: tổng số click của tất cả link
+
     const totalView = await ShortenLink.aggregate([
         { $group: { _id: null, total: { $sum: '$click_count' } } }
     ])
-    // Số lượng người dùng
+
     const totalUsers = await User.countDocuments({})
-    // Referral Earnings: tổng earned_amount từ tất cả link (giả sử có trường này, nếu không có thì cần sửa lại)
+
     const referralEarnings = await ShortenLink.aggregate([
         { $group: { _id: null, total: { $sum: '$earned_amount' } } }
     ])
-    // Average CPM: trung bình CPM của tất cả link (giả sử có trường này, nếu không có thì cần sửa lại)
+
     const avgCPM = await ShortenLink.aggregate([
         { $group: { _id: null, avg: { $avg: '$cpm' } } }
     ])
