@@ -28,7 +28,7 @@ export async function createWithdrawRequest({
     if (!user) throw new Error('User not found')
 
     if (user.balance < amount_money) throw new Error('Số dư không đủ')
-    if (amount_money < minAmount) throw new Error(`Số tiền rút phải lớn hơn hoặc bằng ${minAmount}`)
+    if (amount_money < minAmount) throw new Error(`Số tiền rút phải lớn hơn hoặc bằng $${minAmount}`)
 
     user.being_paid = formatDecimal((user.being_paid || 0) + amount_money)
     user.balance = formatDecimal(user.balance - amount_money)

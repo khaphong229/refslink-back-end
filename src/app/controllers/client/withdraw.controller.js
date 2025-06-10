@@ -23,7 +23,6 @@ export async function createWithdrawRequest(req, res) {
             minAmount,
         })
         res.status(201).jsonify(withdraw)
-        res.status(201).jsonify(withdraw)
     } catch (error) {
         abort(400, error.message)
     }
