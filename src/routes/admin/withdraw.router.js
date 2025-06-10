@@ -5,7 +5,7 @@ import requireAuthentications from '@/app/middleware/common/admin/require-authen
 
 const router = Router()
 
-router.use(asyncHandler(requireAuthentications))
+router.use(asyncHandler(requireAuthentications))  
 
 router.get(
     '/',
