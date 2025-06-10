@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (urls.length === 0) return;
 
   try {
-    const response = await fetch('http://localhost:3111/st/bulk', {
+    const response = await fetch('https://deploy-be-resfink.onrender.com/st/bulk', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, urls }),
