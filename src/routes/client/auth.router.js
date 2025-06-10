@@ -72,6 +72,13 @@ authRouter.get('/login/success', asyncHandler(authController.loginSuccess))
 
 authRouter.post('/logout', asyncHandler(requireAuthentication), asyncHandler(authController.logout))
 
+authRouter.patch(
+    '/change-password',
+    asyncHandler(requireAuthentication),
+    asyncHandler(validate(authRequest.changePassword)),
+    asyncHandler(authController.changePassword)
+)
+
 authRouter.post(
     '/forgot-password',
     asyncHandler(validate(authRequest.forgotPassword)),
