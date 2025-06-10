@@ -13,7 +13,7 @@ router.post(
 
 router.get(
     '/',
-    requireAuthentication,
+    asyncHandler(requireAuthentication),
     asyncHandler(withdrawController.getAllWithdrawRequests)
 )
 
